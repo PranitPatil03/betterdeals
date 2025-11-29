@@ -19,7 +19,6 @@ import {
   ChevronUp,
 } from "lucide-react";
 import Link from "next/link";
-import Image from "next/image";
 
 export default function ProductCard({ product }) {
   const [showChart, setShowChart] = useState(false);
@@ -37,12 +36,11 @@ export default function ProductCard({ product }) {
       <CardHeader className="pb-3">
         <div className="flex gap-4">
           {product.image_url && (
-            <Image
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
               src={product.image_url}
               alt={product.name}
-              width={80}
-              height={80}
-              className="object-cover rounded-md border"
+              className="w-20 h-20 object-cover rounded-md border"
             />
           )}
 
