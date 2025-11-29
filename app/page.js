@@ -1,9 +1,9 @@
 import { createClient } from "@/utils/supabase/server";
-import { getProducts, signOut } from "./actions";
+import { getProducts } from "./actions";
 import AddProductForm from "@/components/AddProductForm";
 import ProductCard from "@/components/ProductCard";
-import { Button } from "@/components/ui/button";
 import { TrendingDown, Zap, Shield, Bell } from "lucide-react";
+import AuthButton from "@/components/AuthButton";
 
 export default async function Home() {
   const supabase = await createClient();
@@ -25,22 +25,15 @@ export default async function Home() {
             <h1 className="text-2xl font-bold text-gray-900">Price Tracker</h1>
           </div>
 
-          {user && (
-            <form action={signOut}>
-              <Button variant="ghost" size="sm" type="submit">
-                Sign Out
-              </Button>
-            </form>
-          )}
+          <AuthButton user={user} />
         </div>
       </header>
 
       {/* Hero Section */}
       <section className="py-20 px-4">
         <div className="max-w-7xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 bg-orange-100 text-orange-700 px-4 py-2 rounded-full text-sm font-medium mb-6">
-            <Zap className="w-4 h-4" />
-            Powered by Firecrawl
+          <div className="inline-flex items-center gap-2 bg-orange-100 text-orange-700 px-6 py-2 rounded-full text-sm font-medium mb-6">
+            Made with ❤️ by Roadside Coder
           </div>
 
           <h2 className="text-5xl font-bold text-gray-900 mb-4 tracking-tight">

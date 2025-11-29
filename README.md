@@ -156,10 +156,7 @@ Update Google OAuth redirect URI to include your Vercel domain.
 
 - [ ] Email alerts on price drops
 - [ ] Price drop threshold settings
-- [ ] Multi-currency support
-- [ ] Price prediction with AI
 - [ ] Browser extension
-- [ ] Share tracked products with friends
 
 ## Contributing
 
