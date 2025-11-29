@@ -1,4 +1,4 @@
-# Smart Product Price Tracker
+# DealDrop - Smart Product Price Tracker
 
 Track product prices across e-commerce sites and get alerts on price drops. Built with Next.js, Firecrawl, and Supabase.
 
@@ -13,9 +13,10 @@ Track product prices across e-commerce sites and get alerts on price drops. Buil
 
 ## Tech Stack
 
-- **Next.js 14** - React framework with App Router
+- **Next.js 16** - React framework with App Router
 - **Firecrawl** - Web data extraction API (handles JS rendering, proxies, anti-bot)
 - **Supabase** - Database, Authentication, Row Level Security
+- **Resend** - Emails
 - **shadcn/ui** - Beautiful UI components
 - **Recharts** - Price history charts
 - **Tailwind CSS** - Styling
