@@ -62,7 +62,7 @@ export default function ProductCard({ product }) {
         </div>
       </CardHeader>
 
-      <CardContent className="pb-3">
+      <CardContent>
         <div className="flex flex-wrap gap-2">
           <Button
             variant="outline"
