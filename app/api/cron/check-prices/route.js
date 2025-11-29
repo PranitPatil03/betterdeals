@@ -5,7 +5,6 @@ import { sendPriceDropAlert } from "@/lib/email";
 
 export async function POST(request) {
   try {
-    // Verify the request is from our cron job
     const authHeader = request.headers.get("authorization");
     const cronSecret = process.env.CRON_SECRET;
 
@@ -15,19 +14,11 @@ export async function POST(request) {
 
     const supabase = await createClient();
 
-    // Get all products from all users with user email
-    const { data: products, error: productsError } = await supabase.from(
-      "products"
-    ).select(`
-        *,
-        user:user_id (
-          email
-        )
-      `);
+    const { data: products, error: productsError } = await supabase
+      .from("products")
+      .select("*");
 
     if (productsError) throw productsError;
-
-    console.log(`Checking prices for ${products.length} products...`);
 
     const results = {
       total: products.length,
@@ -37,14 +28,11 @@ export async function POST(request) {
       alertsSent: 0,
     };
 
-    // Process each product
     for (const product of products) {
       try {
-        // Scrape latest price with Firecrawl
         const productData = await scrapeProduct(product.url);
 
         if (!productData.currentPrice) {
-          console.error(`Failed to get price for product: ${product.name}`);
           results.failed++;
           continue;
         }
@@ -52,7 +40,6 @@ export async function POST(request) {
         const newPrice = parseFloat(productData.currentPrice);
         const oldPrice = parseFloat(product.current_price);
 
-        // Update product with new price
         await supabase
           .from("products")
           .update({
@@ -64,7 +51,6 @@ export async function POST(request) {
           })
           .eq("id", product.id);
 
-        // Add to price history only if price changed
         if (oldPrice !== newPrice) {
           await supabase.from("price_history").insert({
             product_id: product.id,
@@ -74,26 +60,25 @@ export async function POST(request) {
 
           results.priceChanges++;
 
-          // Send email alert if price dropped
-          if (newPrice < oldPrice && product.user?.email) {
-            const emailResult = await sendPriceDropAlert(
-              product.user.email,
-              product,
-              oldPrice,
-              newPrice
-            );
+          // Get user email for alerts
+          if (newPrice < oldPrice) {
+            const {
+              data: { user },
+            } = await supabase.auth.admin.getUserById(product.user_id);
 
-            if (emailResult.success) {
-              results.alertsSent++;
-              console.log(
-                `Alert sent to ${product.user.email} for ${product.name}`
+            if (user?.email) {
+              const emailResult = await sendPriceDropAlert(
+                user.email,
+                product,
+                oldPrice,
+                newPrice
               );
+
+              if (emailResult.success) {
+                results.alertsSent++;
+              }
             }
           }
-
-          console.log(
-            `Price changed for ${product.name}: ${oldPrice} → ${newPrice}`
-          );
         }
 
         results.updated++;
@@ -102,8 +87,6 @@ export async function POST(request) {
         results.failed++;
       }
     }
-
-    console.log("Price check completed:", results);
 
     return NextResponse.json({
       success: true,
@@ -116,8 +99,7 @@ export async function POST(request) {
   }
 }
 
-// Allow GET for manual testing
-export async function GET(request) {
+export async function GET() {
   return NextResponse.json({
     message: "Price check endpoint is working. Use POST to trigger.",
   });
