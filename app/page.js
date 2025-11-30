@@ -51,43 +51,47 @@ export default async function Home() {
           <AddProductForm user={user} />
 
           {/* Features */}
-          <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto mt-16">
-            <div className="bg-white p-6 rounded-xl border border-gray-200">
-              <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mb-4 mx-auto">
-                <Rabbit className="w-6 h-6 text-orange-500" />
+          {products.length === 0 && (
+            <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto mt-16">
+              <div className="bg-white p-6 rounded-xl border border-gray-200">
+                <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mb-4 mx-auto">
+                  <Rabbit className="w-6 h-6 text-orange-500" />
+                </div>
+                <h3 className="font-semibold text-gray-900 mb-2">
+                  Lightning Fast
+                </h3>
+                <p className="text-sm text-gray-600">
+                  Deal Drop extracts prices in seconds, handling JavaScript and
+                  dynamic content
+                </p>
               </div>
-              <h3 className="font-semibold text-gray-900 mb-2">
-                Lightning Fast
-              </h3>
-              <p className="text-sm text-gray-600">
-                Deal Drop extracts prices in seconds, handling JavaScript and
-                dynamic content
-              </p>
-            </div>
 
-            <div className="bg-white p-6 rounded-xl border border-gray-200">
-              <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mb-4 mx-auto">
-                <Shield className="w-6 h-6 text-orange-500" />
+              <div className="bg-white p-6 rounded-xl border border-gray-200">
+                <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mb-4 mx-auto">
+                  <Shield className="w-6 h-6 text-orange-500" />
+                </div>
+                <h3 className="font-semibold text-gray-900 mb-2">
+                  Always Reliable
+                </h3>
+                <p className="text-sm text-gray-600">
+                  Works across all major e-commerce sites with built-in anti-bot
+                  protection
+                </p>
               </div>
-              <h3 className="font-semibold text-gray-900 mb-2">
-                Always Reliable
-              </h3>
-              <p className="text-sm text-gray-600">
-                Works across all major e-commerce sites with built-in anti-bot
-                protection
-              </p>
-            </div>
 
-            <div className="bg-white p-6 rounded-xl border border-gray-200">
-              <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mb-4 mx-auto">
-                <Bell className="w-6 h-6 text-orange-500" />
+              <div className="bg-white p-6 rounded-xl border border-gray-200">
+                <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mb-4 mx-auto">
+                  <Bell className="w-6 h-6 text-orange-500" />
+                </div>
+                <h3 className="font-semibold text-gray-900 mb-2">
+                  Smart Alerts
+                </h3>
+                <p className="text-sm text-gray-600">
+                  Get notified instantly when prices drop below your target
+                </p>
               </div>
-              <h3 className="font-semibold text-gray-900 mb-2">Smart Alerts</h3>
-              <p className="text-sm text-gray-600">
-                Get notified instantly when prices drop below your target
-              </p>
             </div>
-          </div>
+          )}
         </div>
       </section>
 
