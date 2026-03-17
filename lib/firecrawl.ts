@@ -1,19 +1,16 @@
 import FirecrawlApp from "@mendable/firecrawl-js";
+import { z } from "zod";
 
 const firecrawl = new FirecrawlApp({
   apiKey: process.env.FIRECRAWL_API_KEY,
 });
 
-const extractionSchema = {
-  type: "object",
-  properties: {
-    productName: { type: "string" },
-    currentPrice: { type: "number" },
-    currencyCode: { type: "string" },
-    productImageUrl: { type: "string" },
-  },
-  required: ["productName", "currentPrice"],
-};
+const extractionSchema = z.object({
+  productName: z.string(),
+  currentPrice: z.number(),
+  currencyCode: z.string().optional(),
+  productImageUrl: z.string().optional(),
+});
 
 export interface ScrapedProductData {
   productName: string;
