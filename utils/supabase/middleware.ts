@@ -8,7 +8,7 @@ export async function updateSession(request: NextRequest) {
   const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
   if (!supabaseUrl || !supabaseKey) {
-    throw new Error("Missing Supabase env vars for middleware");
+    return NextResponse.next();
   }
 
   let supabaseResponse = NextResponse.next({
