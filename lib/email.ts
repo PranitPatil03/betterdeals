@@ -1,19 +1,26 @@
 import { Resend } from "resend";
+import type { ProductRecord } from "@/lib/types";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function sendPriceDropAlert(
-  userEmail,
-  product,
-  oldPrice,
-  newPrice
+  userEmail: string,
+  product: ProductRecord,
+  oldPrice: number,
+  newPrice: number,
 ) {
   try {
+    const fromEmail = process.env.RESEND_FROM_EMAIL;
+
+    if (!fromEmail) {
+      return { error: "RESEND_FROM_EMAIL is not configured" };
+    }
+
     const priceDrop = oldPrice - newPrice;
     const percentageDrop = ((priceDrop / oldPrice) * 100).toFixed(1);
 
     const { data, error } = await resend.emails.send({
-      from: process.env.RESEND_FROM_EMAIL,
+      from: fromEmail,
       to: userEmail,
       subject: `🎉 Price Drop Alert: ${product.name}`,
       html: `
@@ -108,6 +115,6 @@ export async function sendPriceDropAlert(
     return { success: true, data };
   } catch (error) {
     console.error("Email error:", error);
-    return { error: error.message };
+    return { error: error instanceof Error ? error.message : "Email failed" };
   }
 }

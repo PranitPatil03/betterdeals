@@ -1,4 +1,4 @@
-# DealDrop - Smart Product Price Tracker
+# Droply - Smart Product Price Tracker
 ### Watch here - https://youtu.be/HakXg-hFZ_c
 
 Track product prices across e-commerce sites and get alerts on price drops. Built with Next.js, Firecrawl, and Supabase.
@@ -7,9 +7,10 @@ Track product prices across e-commerce sites and get alerts on price drops. Buil
 
 - 🔍 **Track Any Product** - Works with Amazon, Zara, Walmart, and more
 - 📊 **Price History Charts** - Interactive graphs showing price trends over time
-- 🔐 **Google Authentication** - Secure sign-in with Google OAuth
+- 🔐 **Supabase Authentication** - Email/password + Google OAuth
+- 💳 **Paid Plans with Stripe** - Checkout, webhook sync, and billing portal
 - 🔄 **Automated Daily Checks** - Scheduled cron jobs check prices automatically
-- 📧 **Email Alerts** - Get notified when prices drop via Resend
+- 📧 **Email Alerts for Pro** - Price-drop emails sent to paid subscribers
 
 ## 🛠️ Tech Stack
 
@@ -25,6 +26,7 @@ Track product prices across e-commerce sites and get alerts on price drops. Buil
   - Row Level Security (RLS)
   - pg_cron for scheduled jobs
 - **Resend** - Transactional emails
+- **Stripe** - Subscriptions and billing webhooks
 - **shadcn/ui** - UI component library
 - **Recharts** - Interactive charts
 - **Tailwind CSS** - Styling
@@ -37,6 +39,7 @@ Before you begin, ensure you have:
 - A [Supabase](https://supabase.com) account
 - A [Firecrawl](https://firecrawl.dev) account
 - A [Resend](https://resend.com) account
+- A [Stripe](https://stripe.com) account
 - Google OAuth credentials from [Google Cloud Console](https://console.cloud.google.com/)
 
 ## 🚀 Setup Instructions
@@ -175,6 +178,12 @@ SELECT cron.schedule(
    - Add authorized redirect URI: `https://<your-project>.supabase.co/auth/v1/callback`
 4. Copy Client ID and Client Secret to Supabase
 
+#### Enable Email/Password Authentication
+
+1. Go to **Authentication** → **Providers** in Supabase
+2. Enable **Email** provider
+3. Choose your sign-up confirmation requirement (recommended: email confirm enabled)
+
 #### Get API Credentials
 
 1. Go to **Settings** → **API**
@@ -215,6 +224,11 @@ CRON_SECRET=your_generated_cron_secret
 
 # App URL
 NEXT_PUBLIC_APP_URL=http://localhost:3000
+
+# Stripe Billing
+STRIPE_SECRET_KEY=sk_test_...
+STRIPE_WEBHOOK_SECRET=whsec_...
+STRIPE_PRO_PRICE_ID=price_...
 ```
 
 **Generate CRON_SECRET:**
@@ -259,10 +273,26 @@ Open [http://localhost:3000](http://localhost:3000)
    - `FIRECRAWL_API_KEY`
    - `RESEND_API_KEY`
    - `RESEND_FROM_EMAIL`
+  - `STRIPE_SECRET_KEY`
+  - `STRIPE_WEBHOOK_SECRET`
+  - `STRIPE_PRO_PRICE_ID`
    - `CRON_SECRET`
    - `NEXT_PUBLIC_APP_URL` (set to your Vercel URL)
 
-4. **Update Supabase Cron Function**
+4. **Configure Stripe Webhook**
+
+  Add this endpoint in Stripe:
+
+  - `https://your-actual-vercel-url.vercel.app/api/stripe/webhook`
+
+  Subscribe to these events:
+
+  - `checkout.session.completed`
+  - `customer.subscription.created`
+  - `customer.subscription.updated`
+  - `customer.subscription.deleted`
+
+5. **Update Supabase Cron Function**
 
    After deployment, update the cron function with your production URL:
 
@@ -284,7 +314,7 @@ Open [http://localhost:3000](http://localhost:3000)
    $$;
    ```
 
-5. **Update Google OAuth Redirect URI**
+6. **Update Google OAuth Redirect URI**
 
    Add your Vercel domain to Google Cloud Console authorized redirect URIs.
 
@@ -297,13 +327,19 @@ Open [http://localhost:3000](http://localhost:3000)
 3. **Data stored** - Product saved to Supabase with Row Level Security
 4. **View tracking** - See current price and interactive price history chart
 
+### Plans: Free vs Paid
+
+- **Free plan**: Track up to 10 products, view price history, and receive price-drop email alerts.
+- **Pro plan**: Unlimited product tracking and priority billing features.
+- **Manage billing**: Paid users can open Stripe Billing Portal to update/correct payment method, change plan, or cancel.
+
 ### Automated Price Checking
 
 1. **Supabase pg_cron** - Runs daily at 9 AM UTC
 2. **Triggers API endpoint** - Makes secure POST request to `/api/cron/check-prices`
 3. **Firecrawl scrapes all products** - Updates prices for all tracked products
 4. **Updates database** - Saves new prices and adds to history if changed
-5. **Sends email alerts** - Notifies users via Resend when prices drop
+5. **Sends Pro email alerts** - Notifies paid users via Resend when prices drop
 
 ### Why Firecrawl?
 
@@ -321,36 +357,44 @@ No need to maintain brittle, site-specific scrapers!
 ## 📁 Project Structure
 
 ```
-dealdrop/
+droply/
 ├── app/
-│   ├── page.js                         # Landing page with product input
-│   ├── actions.js                      # Server actions for DB operations
+│   ├── page.tsx                        # Landing page with product input
+│   ├── actions.ts                      # Server actions for DB operations
 │   ├── auth/
 │   │   └── callback/
-│   │       └── route.js                # OAuth callback handler
+│   │       └── route.ts                # OAuth callback handler
 │   └── api/
+│       ├── stripe/
+│       │   ├── checkout/route.ts       # Stripe checkout session
+│       │   ├── portal/route.ts         # Billing portal session
+│       │   └── webhook/route.ts        # Stripe webhook events
 │       └── cron/
 │           └── check-prices/
-│               └── route.js            # Cron endpoint for price checks
+│               └── route.ts            # Cron endpoint for price checks
 ├── components/
 │   ├── ui/                             # shadcn/ui components
-│   ├── AddProductForm.js               # Product URL input with auth modal
-│   ├── ProductCard.js                  # Product display with chart toggle
-│   ├── PriceChart.js                   # Recharts price history
-│   └── AuthModal.js                    # Google sign-in modal
+│   ├── AddProductForm.tsx              # Product URL input with auth modal
+│   ├── ProductCard.tsx                 # Product display with chart toggle
+│   ├── PriceChart.tsx                  # Recharts price history
+│   ├── AuthModal.tsx                   # Email/password + Google sign-in
+│   └── BillingCard.tsx                 # Plan details and upgrade/manage actions
 ├── lib/
-│   ├── firecrawl.js                    # Firecrawl API integration
-│   ├── email.js                        # Resend email templates
-│   └── utils.js                        # Utility functions
+│   ├── firecrawl.ts                    # Firecrawl API integration
+│   ├── email.ts                        # Resend email templates
+│   ├── billing.ts                      # Plan snapshot lookup
+│   ├── stripe.ts                       # Stripe SDK setup
+│   └── utils.ts                        # Utility functions
 ├── utils/
 │   └── supabase/
-│       ├── client.js                   # Browser Supabase client
-│       ├── server.js                   # Server Supabase client
-│       └── middleware.js               # Session refresh middleware
+│       ├── client.ts                   # Browser Supabase client
+│       ├── server.ts                   # Server Supabase client
+│       └── middleware.ts               # Session refresh middleware
 ├── supabase/
 │   └── migrations/
 │       ├── 001_schema.sql              # Database tables & RLS
 │       └── 002_setup_cron.sql          # Cron job setup
+│       └── 003_subscriptions_and_billing.sql
 ├── proxy.ts                            # Next.js 15 proxy (replaces middleware)
 └── .env.local                          # Environment variables
 ```

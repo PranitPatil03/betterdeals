@@ -2,11 +2,23 @@
 
 import { createClient } from "@/utils/supabase/server";
 import { scrapeProduct } from "@/lib/firecrawl";
+import { getBillingSnapshotForUser } from "@/lib/billing";
+import { FREE_PLAN_PRODUCT_LIMIT } from "@/lib/plans";
+import type { PriceHistoryRecord, ProductRecord } from "@/lib/types";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
-export async function addProduct(formData) {
-  const url = formData.get("url");
+type AddProductResult = {
+  success?: boolean;
+  error?: string;
+  message?: string;
+  product?: ProductRecord;
+  upgradeRequired?: boolean;
+};
+
+export async function addProduct(formData: FormData): Promise<AddProductResult> {
+  const rawUrl = formData.get("url");
+  const url = typeof rawUrl === "string" ? rawUrl.trim() : "";
 
   if (!url) {
     return { error: "URL is required" };
@@ -22,6 +34,39 @@ export async function addProduct(formData) {
       return { error: "Not authenticated" };
     }
 
+    const { data: existingProduct, error: existingError } = await supabase
+      .from("products")
+      .select("id, current_price")
+      .eq("user_id", user.id)
+      .eq("url", url)
+      .maybeSingle<{ id: string; current_price: number }>();
+
+    if (existingError) {
+      throw existingError;
+    }
+
+    const { count: productCount, error: countError } = await supabase
+      .from("products")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", user.id);
+
+    if (countError) {
+      throw countError;
+    }
+
+    const billing = await getBillingSnapshotForUser(user.id);
+
+    if (
+      !existingProduct &&
+      billing.tier === "free" &&
+      (productCount ?? 0) >= FREE_PLAN_PRODUCT_LIMIT
+    ) {
+      return {
+        error: `Tracking limit reached (${FREE_PLAN_PRODUCT_LIMIT} products). Manage billing to continue tracking.`,
+        upgradeRequired: true,
+      };
+    }
+
     // Scrape product data with Firecrawl
     const productData = await scrapeProduct(url);
 
@@ -30,16 +75,8 @@ export async function addProduct(formData) {
       return { error: "Could not extract product information from this URL" };
     }
 
-    const newPrice = parseFloat(productData.currentPrice);
+    const newPrice = Number(productData.currentPrice);
     const currency = productData.currencyCode || "USD";
-
-    // Check if product exists to determine if it's an update
-    const { data: existingProduct } = await supabase
-      .from("products")
-      .select("id, current_price")
-      .eq("user_id", user.id)
-      .eq("url", url)
-      .single();
 
     const isUpdate = !!existingProduct;
 
@@ -62,13 +99,13 @@ export async function addProduct(formData) {
         }
       )
       .select()
-      .single();
+      .single<ProductRecord>();
 
     if (error) throw error;
 
     // Add to price history if it's a new product OR price changed
     const shouldAddHistory =
-      !isUpdate || existingProduct.current_price !== newPrice;
+      !isUpdate || Number(existingProduct.current_price) !== newPrice;
 
     if (shouldAddHistory) {
       await supabase.from("price_history").insert({
@@ -79,6 +116,7 @@ export async function addProduct(formData) {
     }
 
     revalidatePath("/");
+    revalidatePath("/dashboard");
     return {
       success: true,
       product,
@@ -88,11 +126,13 @@ export async function addProduct(formData) {
     };
   } catch (error) {
     console.error("Add product error:", error);
-    return { error: error.message || "Failed to add product" };
+    return {
+      error: error instanceof Error ? error.message : "Failed to add product",
+    };
   }
 }
 
-export async function deleteProduct(productId) {
+export async function deleteProduct(productId: string) {
   try {
     const supabase = await createClient();
     const { error } = await supabase
@@ -103,19 +143,21 @@ export async function deleteProduct(productId) {
     if (error) throw error;
 
     revalidatePath("/");
+    revalidatePath("/dashboard");
     return { success: true };
   } catch (error) {
-    return { error: error.message };
+    return { error: error instanceof Error ? error.message : "Delete failed" };
   }
 }
 
-export async function getProducts() {
+export async function getProducts(): Promise<ProductRecord[]> {
   try {
     const supabase = await createClient();
     const { data, error } = await supabase
       .from("products")
       .select("*")
-      .order("created_at", { ascending: false });
+      .order("created_at", { ascending: false })
+      .returns<ProductRecord[]>();
 
     if (error) throw error;
     return data || [];
@@ -125,14 +167,17 @@ export async function getProducts() {
   }
 }
 
-export async function getPriceHistory(productId) {
+export async function getPriceHistory(
+  productId: string,
+): Promise<PriceHistoryRecord[]> {
   try {
     const supabase = await createClient();
     const { data, error } = await supabase
       .from("price_history")
       .select("*")
       .eq("product_id", productId)
-      .order("checked_at", { ascending: true });
+      .order("checked_at", { ascending: true })
+      .returns<PriceHistoryRecord[]>();
 
     if (error) throw error;
     return data || [];
@@ -146,5 +191,6 @@ export async function signOut() {
   const supabase = await createClient();
   await supabase.auth.signOut();
   revalidatePath("/");
+  revalidatePath("/dashboard");
   redirect("/");
 }

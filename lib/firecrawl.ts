@@ -4,7 +4,14 @@ const firecrawl = new FirecrawlApp({
   apiKey: process.env.FIRECRAWL_API_KEY,
 });
 
-export async function scrapeProduct(url) {
+export interface ScrapedProductData {
+  productName: string;
+  currentPrice: number | string;
+  currencyCode?: string;
+  productImageUrl?: string;
+}
+
+export async function scrapeProduct(url: string): Promise<ScrapedProductData> {
   try {
     const result = await firecrawl.scrapeUrl(url, {
       formats: ["extract"],
@@ -24,8 +31,12 @@ export async function scrapeProduct(url) {
       },
     });
 
+    if (!result || typeof result !== "object" || !("extract" in result)) {
+      throw new Error("Invalid Firecrawl response");
+    }
+
     // Firecrawl returns data in result.extract
-    const extractedData = result.extract;
+    const extractedData = (result as { extract?: ScrapedProductData }).extract;
 
     if (!extractedData || !extractedData.productName) {
       throw new Error("No data extracted from URL");
@@ -34,6 +45,8 @@ export async function scrapeProduct(url) {
     return extractedData;
   } catch (error) {
     console.error("Firecrawl scrape error:", error);
-    throw new Error(`Failed to scrape product: ${error.message}`);
+    throw new Error(
+      `Failed to scrape product: ${error instanceof Error ? error.message : "Unknown error"}`,
+    );
   }
 }

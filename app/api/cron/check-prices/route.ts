@@ -2,25 +2,33 @@ import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { scrapeProduct } from "@/lib/firecrawl";
 import { sendPriceDropAlert } from "@/lib/email";
+import type { ProductRecord } from "@/lib/types";
 
-export async function POST(request) {
+export async function POST(request: Request) {
   try {
     const authHeader = request.headers.get("authorization");
     const cronSecret = process.env.CRON_SECRET;
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+    if (!supabaseUrl || !serviceRoleKey) {
+      return NextResponse.json(
+        { error: "Supabase env vars are missing" },
+        { status: 500 },
+      );
+    }
 
     if (!cronSecret || authHeader !== `Bearer ${cronSecret}`) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     // Use service role to bypass RLS
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL,
-      process.env.SUPABASE_SERVICE_ROLE_KEY
-    );
+    const supabase = createClient(supabaseUrl, serviceRoleKey);
 
     const { data: products, error: productsError } = await supabase
       .from("products")
-      .select("*");
+      .select("*")
+      .returns<ProductRecord[]>();
 
     if (productsError) throw productsError;
 
@@ -43,8 +51,8 @@ export async function POST(request) {
           continue;
         }
 
-        const newPrice = parseFloat(productData.currentPrice);
-        const oldPrice = parseFloat(product.current_price);
+        const newPrice = Number(productData.currentPrice);
+        const oldPrice = Number(product.current_price);
 
         await supabase
           .from("products")
@@ -100,7 +108,10 @@ export async function POST(request) {
     });
   } catch (error) {
     console.error("Cron job error:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : "Cron failed" },
+      { status: 500 },
+    );
   }
 }
 
