@@ -35,11 +35,13 @@ export default function ProductCard({ product }: Props) {
 
   return (
     <>
-      {/* Card — fixed square, click opens modal */}
-      <button
-        type="button"
+      {/* Card — fixed height, click opens modal */}
+      <div
+        role="button"
+        tabIndex={0}
         onClick={() => setOpen(true)}
-        className="group text-left w-full h-[290px] overflow-hidden rounded-2xl bg-white shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 flex flex-col"
+        onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setOpen(true); } }}
+        className="group text-left w-full h-[290px] overflow-hidden rounded-2xl bg-white shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 flex flex-col cursor-pointer"
       >
         {/* Product image — top half */}
         <div className="relative h-[160px] flex items-center justify-center">
@@ -81,7 +83,7 @@ export default function ProductCard({ product }: Props) {
             </div>
           </div>
         </div>
-      </button>
+      </div>
 
       {/* Detail modal */}
       {open && (
