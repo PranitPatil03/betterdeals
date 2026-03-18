@@ -166,7 +166,7 @@ export default function ProductModal({ product, open, onClose }: { product: Prod
               </div>
               {/* Alert price setter — below with border */}
               <div className="w-full px-5 pb-8 pt-2">
-                <div className="rounded-xl border bg-white p-3">
+                <div className="rounded-xl bg-white p-3">
                   <p className="mb-2 flex items-center gap-1.5 text-xs font-medium text-slate-500">
                     <Bell className="size-3.5" />
                     {localAlertPrice ? "Update alert price" : "Set price alert"}

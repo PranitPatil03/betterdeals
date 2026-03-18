@@ -80,16 +80,6 @@ export default function ProductCard({ product }: Props) {
               <Label htmlFor={`alert-switch-${product.id}`}>Alert</Label>
             </div>
           </div>
-          {/* Alert text below price */}
-          {alertPrice !== null && alertIsValid && (
-            <div className="mt-1 text-xs font-medium text-slate-700">
-              {isTargetMet ? (
-                <span className="text-green-700">Target reached. Great time to buy.</span>
-              ) : (
-                <span>Alert set at {formatPrice(alertPrice, product.currency)}</span>
-              )}
-            </div>
-          )}
         </div>
       </button>
 
