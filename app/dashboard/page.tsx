@@ -51,10 +51,17 @@ export default async function DashboardPage() {
 
   if (!user) redirect("/sign-in");
 
-  const billing = await getBillingSnapshotForUser(user.id);
+  const [billing, productCount] = await Promise.all([
+    getBillingSnapshotForUser(user.id),
+    supabase
+      .from("products")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", user.id)
+      .then((res: { count: number | null }) => res.count ?? 0),
+  ]);
 
   const isLimitReached =
-    billing.tier === "free";
+    billing.tier === "free" && productCount >= FREE_PLAN_PRODUCT_LIMIT;
 
   return (
     <main className="min-h-screen bg-[#f8fafc]">

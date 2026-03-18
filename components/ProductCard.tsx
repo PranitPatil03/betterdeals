@@ -84,11 +84,13 @@ export default function ProductCard({ product }: Props) {
       </button>
 
       {/* Detail modal */}
-      <ProductModal
-        product={product}
-        open={open}
-        onClose={() => setOpen(false)}
-      />
+      {open && (
+        <ProductModal
+          product={product}
+          open={open}
+          onClose={() => setOpen(false)}
+        />
+      )}
     </>
   );
 }
