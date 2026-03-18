@@ -81,13 +81,14 @@ export default function ProductModal({ product, open, onClose }: { product: Prod
         <div className="flex flex-1 flex-row min-h-[340px]">
           {/* Left: image + details */}
           <div className="w-[260px] shrink-0 flex flex-col items-center justify-start bg-white border-r border-slate-100 p-0">
-            <div className="w-full flex items-center justify-center bg-slate-50 border-b border-slate-100" style={{ height: 220 }}>
+            <div className="w-full flex items-center justify-center" style={{ height: 220 }}>
               {product.image_url ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
                   src={product.image_url}
                   alt={product.name}
                   className="max-h-[180px] max-w-[90%] object-contain p-4"
+                  style={{ background: "none", width: "180px", height: "180px" }}
                 />
               ) : (
                 <div className="flex h-[180px] w-full items-center justify-center">

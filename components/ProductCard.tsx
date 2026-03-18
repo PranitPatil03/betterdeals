@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { Bell, BellOff, TrendingDown } from "lucide-react";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import ProductModal from "./ProductModal";
 import type { ProductRecord } from "@/lib/types";
 import { getSourceBadge } from "@/lib/product-source";
@@ -38,13 +40,14 @@ export default function ProductCard({ product }: Props) {
         className="group text-left w-[260px] h-[260px] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 flex flex-col"
       >
         {/* Product image — fixed square top half */}
-        <div className="relative flex-1 min-h-0 flex items-center justify-center bg-slate-50">
+        <div className="relative flex-1 min-h-0 flex items-center justify-center">
           {product.image_url ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
               src={product.image_url}
               alt={product.name}
               className="max-h-[110px] max-w-[90%] object-contain p-2 transition-transform duration-300 group-hover:scale-[1.04]"
+              style={{ background: "none", width: "110px", height: "110px" }}
             />
           ) : (
             <div className="flex h-full w-full items-center justify-center">
@@ -66,22 +69,26 @@ export default function ProductCard({ product }: Props) {
             {product.name}
           </p>
 
-          {/* Price row with alert toggle */}
           <div className="flex items-center justify-between gap-2">
             <span className="text-lg font-bold tracking-tight text-slate-900">
               {formatPrice(currentPrice, product.currency)}
             </span>
-            {/* Alert toggle button */}
-            <button
-              type="button"
-              aria-label={alertPrice !== null ? "Disable alert" : "Enable alert"}
-              className={`ml-2 rounded-full border-2 ${alertPrice !== null ? (isTargetMet ? "border-green-500 bg-green-50" : "border-amber-400 bg-amber-50") : "border-slate-200 bg-slate-50"} p-1 transition-colors`}
-              tabIndex={-1}
-              onClick={e => { e.stopPropagation(); setOpen(true); }}
-            >
-              {alertPrice !== null ? <Bell className="size-4 text-green-600" /> : <BellOff className="size-4 text-slate-400" />}
-            </button>
+            {/* Alert toggle using Switch/Label */}
+            <div className="flex items-center space-x-2">
+              <Switch id={`alert-switch-${product.id}`} checked={alertPrice !== null} onCheckedChange={() => setOpen(true)} />
+              <Label htmlFor={`alert-switch-${product.id}`}>Alert</Label>
+            </div>
           </div>
+          {/* Alert text below price */}
+          {alertPrice !== null && (
+            <div className="mt-1 text-xs font-medium text-slate-700">
+              {isTargetMet ? (
+                <span className="text-green-700">Checkout now, price drop!</span>
+              ) : (
+                <span>Alert set at {formatPrice(alertPrice, product.currency)}</span>
+              )}
+            </div>
+          )}
         </div>
       </button>
 

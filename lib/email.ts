@@ -58,18 +58,23 @@ export async function sendPriceDropAlert(
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f4f5;padding:32px 16px;">
     <tr>
       <td align="center">
-        <table role="presentation" width="520" cellpadding="0" cellspacing="0" style="max-width:520px;width:100%;background:#fff;border-radius:18px;box-shadow:0 2px 8px rgba(0,0,0,0.06);padding:0 0 24px 0;">
-          <!-- Logo -->
+        <table role="presentation" width="520" cellpadding="0" cellspacing="0" style="max-width:520px;width:100%;border-radius:18px;box-shadow:0 2px 8px rgba(0,0,0,0.06);padding:0 0 24px 0;background:none;">
+          <!-- Text logo and description, left-aligned -->
           <tr>
-            <td style="padding-top:32px;padding-bottom:8px;text-align:center;">
-              <img src="https://betterdeals.vercel.app/logo-email.png" alt="Better Deals" style="height:54px;width:auto;display:block;margin:0 auto 8px auto;" />
-              <div style="font-size:18px;font-weight:700;color:#0f172a;letter-spacing:-0.3px;">Better Deals</div>
+            <td style="padding-top:32px;padding-bottom:8px;text-align:left;">
+              <div style="font-size:22px;font-weight:700;color:#0f172a;letter-spacing:-0.3px;">Better Deals</div>
               <div style="font-size:14px;color:#64748b;margin-top:2px;margin-bottom:18px;">Track prices. Save money. Get notified.</div>
+            </td>
+          </tr>
+          <!-- Product image -->
+          <tr>
+            <td style="padding-bottom:18px;text-align:left;">
+              ${product.image_url ? `<img src="${product.image_url}" alt="${product.name}" style="height:90px;width:90px;object-fit:contain;border-radius:12px;border:1px solid #e5e7eb;" />` : ""}
             </td>
           </tr>
           <!-- Main message -->
           <tr>
-            <td style="padding:0 32px 0 32px;text-align:center;">
+            <td style="padding:0 32px 0 32px;text-align:left;">
               <div style="font-size:17px;font-weight:600;color:#0f172a;margin-bottom:10px;">
                 ${isTargetHit ? "🎯 Target price reached!" : `📉 Price drop alert!`}
               </div>
@@ -90,7 +95,7 @@ export async function sendPriceDropAlert(
           </tr>
           <!-- Footer -->
           <tr>
-            <td style="padding-top:32px;text-align:center;">
+            <td style="padding-top:32px;text-align:left;">
               <p style="margin:0;font-size:12px;color:#94a3b8;line-height:1.5;">
                 You're receiving this because you're tracking this product on
                 <a href="${appUrl}" style="color:#64748b;text-decoration:underline;">Better Deals</a>.
