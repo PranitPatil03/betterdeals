@@ -3,6 +3,7 @@ import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 import { getStripeClient } from "@/lib/stripe";
 import { getSupabaseAdmin } from "@/lib/supabase-admin";
+import { sendUpgradeConfirmation } from "@/lib/email";
 import type { SubscriptionRecord, SubscriptionStatus } from "@/lib/types";
 
 export const runtime = "nodejs";
@@ -146,6 +147,16 @@ export async function POST(request: Request) {
 
         if (userId) {
           await upsertSubscriptionFromStripe(userId, subscription);
+
+          // Send upgrade confirmation email
+          const supabaseAdmin = getSupabaseAdmin();
+          if (supabaseAdmin) {
+            const { data: userData } = await supabaseAdmin.auth.admin.getUserById(userId);
+            const email = userData?.user?.email;
+            if (email) {
+              await sendUpgradeConfirmation(email, { planName: "Pro" });
+            }
+          }
         }
       }
     }
