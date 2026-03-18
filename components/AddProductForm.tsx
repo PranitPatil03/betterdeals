@@ -71,7 +71,7 @@ export default function AddProductForm({
           type="submit"
           disabled={loading}
           variant="default"
-          className="h-10 sm:h-12 px-8 bg-gradient-to-b from-sky-300 to-blue-500 text-white shadow-[0_4px_14px_rgba(56,189,248,0.45)] transition-all hover:scale-[1.01] hover:shadow-[0_6px_20px_rgba(56,189,248,0.55)]"
+          className="h-10 sm:h-12 px-8 bg-linear-to-b from-sky-300 to-blue-500 text-white shadow-[0_4px_14px_rgba(56,189,248,0.45)] transition-all hover:scale-[1.01] hover:shadow-[0_6px_20px_rgba(56,189,248,0.55)]"
           size="lg"
         >
           {loading ? (

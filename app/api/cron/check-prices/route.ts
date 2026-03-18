@@ -172,8 +172,6 @@ export async function POST(request: Request) {
   }
 }
 
-export async function GET() {
-  return NextResponse.json({
-    message: "Price check endpoint is working. Use POST to trigger.",
-  });
+export async function GET(request: Request) {
+  return POST(request);
 }

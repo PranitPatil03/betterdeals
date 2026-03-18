@@ -155,7 +155,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
             onClick={handleEmailAuth}
             variant="default"
             size="lg"
-            className="w-full bg-gradient-to-b from-blue-400 to-blue-600 text-white shadow-[0_4px_14px_rgba(37,99,235,0.35)] transition-all hover:scale-[1.01] hover:shadow-[0_6px_20px_rgba(37,99,235,0.5)]"
+            className="w-full bg-linear-to-b from-blue-400 to-blue-600 text-white shadow-[0_4px_14px_rgba(37,99,235,0.35)] transition-all hover:scale-[1.01] hover:shadow-[0_6px_20px_rgba(37,99,235,0.5)]"
             disabled={loading}
           >
             {loading ? (
