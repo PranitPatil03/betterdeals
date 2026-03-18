@@ -37,17 +37,16 @@ export default function ProductCard({ product }: Props) {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="group text-left w-[260px] h-[260px] overflow-hidden rounded-2xl bg-white shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 flex flex-col"
+        className="group text-left w-full overflow-hidden rounded-2xl bg-white shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 flex flex-col"
       >
-        {/* Product image — fixed square top half */}
-        <div className="relative flex-1 min-h-0 flex items-center justify-center">
+        {/* Product image — top half */}
+        <div className="relative h-[160px] flex items-center justify-center">
           {product.image_url ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
               src={product.image_url}
               alt={product.name}
-              className="max-h-[145px] max-w-[92%] object-contain p-2 transition-transform duration-500 group-hover:scale-[1.1]"
-              style={{ background: "none", width: "145px", height: "145px" }}
+              className="max-h-[130px] max-w-[85%] object-contain p-2 transition-transform duration-500 group-hover:scale-[1.08]"
             />
           ) : (
             <div className="flex h-full w-full items-center justify-center">

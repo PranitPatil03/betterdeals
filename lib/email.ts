@@ -65,8 +65,8 @@ export async function sendPriceDropAlert(
     const safeImageUrl = product.image_url ? escapeHtml(product.image_url) : "";
 
     const subject = isTargetHit
-      ? `Target reached: ${shortName(product.name)} is now ${currentPriceLabel}`
-      : `Price drop alert: ${shortName(product.name)} is now ${currentPriceLabel}`;
+      ? `Your target price was hit — ${shortName(product.name)} dropped to ${currentPriceLabel}`
+      : `Price dropped ${percentLabel} — ${shortName(product.name)} is now ${currentPriceLabel}`;
 
     const plainText = [
       isTargetHit ? "Your target price was reached." : "Price drop detected.",

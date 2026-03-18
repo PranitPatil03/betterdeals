@@ -71,107 +71,109 @@ export default function ProductModal({ product, open, onClose }: { product: Prod
     <Dialog open={open} onOpenChange={(isOpen: boolean) => !isOpen && onClose()}>
       <DialogContent
         showCloseButton={false}
-        className="w-[95vw] max-w-[1120px] p-0 overflow-hidden rounded-3xl gap-0 max-h-[92vh] min-h-[620px] flex flex-col border-0 shadow-2xl"
+        className="w-[95vw] max-w-[960px] p-0 overflow-hidden rounded-3xl gap-0 max-h-[92vh] flex flex-col border-0 shadow-2xl"
       >
-        <div className="flex items-center justify-end px-4 pt-4">
-          <DialogClose asChild>
-            <button
-              type="button"
-              className="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-600 transition-colors hover:bg-slate-200 hover:text-slate-900"
-            >
-              <X className="size-3.5" />
-              Close
-            </button>
-          </DialogClose>
-        </div>
-
-        {/* Horizontal layout: left = image/details, right = chart/prices */}
-        <div className="flex flex-1 min-h-0 flex-col lg:flex-row">
-          {/* Left: image + details */}
-          <div className="lg:w-[420px] shrink-0 flex flex-col items-center justify-start bg-white p-0 lg:border-r lg:border-slate-100/70">
-            <div className="w-full flex items-center justify-center" style={{ height: 280 }}>
-              {product.image_url ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={product.image_url}
-                  alt={product.name}
-                  className="max-h-[240px] max-w-[92%] object-contain p-4 transition-transform duration-500 hover:scale-[1.05]"
-                  style={{ background: "none", width: "250px", height: "250px" }}
-                />
-              ) : (
-                <div className="flex h-[240px] w-full items-center justify-center">
-                  <TrendingDown className="size-10 text-slate-300" />
+        {/* Scrollable wrapper */}
+        <div className="flex-1 overflow-y-auto">
+          {/* Horizontal layout: left = image/details, right = chart/prices */}
+          <div className="flex min-h-0 flex-col md:flex-row">
+            {/* Left: image + details */}
+            <div className="md:w-[380px] shrink-0 flex flex-col items-center justify-start bg-white p-0">
+              <div className="relative w-full flex items-center justify-center pt-4" style={{ minHeight: 220 }}>
+                {/* Close button overlaid on image area */}
+                <div className="absolute right-3 top-3 z-10">
+                  <DialogClose asChild>
+                    <button
+                      type="button"
+                      className="inline-flex items-center gap-1 rounded-full bg-white/90 backdrop-blur-sm px-3 py-1.5 text-xs font-semibold text-slate-600 shadow-sm transition-colors hover:bg-white hover:text-slate-900"
+                    >
+                      <X className="size-3.5" />
+                      Close
+                    </button>
+                  </DialogClose>
                 </div>
-              )}
-            </div>
-            {/* Source badge + name */}
-            <div className="w-full px-6 pt-2">
-              <span className={`inline-block rounded-full border px-2.5 py-0.5 text-xs font-medium ${source.className}`}>{source.label}</span>
-              <h2 className="mt-1.5 line-clamp-2 text-3xl font-bold leading-tight text-slate-900">{product.name}</h2>
-            </div>
-            {/* Price */}
-            <div className="w-full px-6 pt-3 pb-1">
-              <p className="text-5xl font-bold tracking-tight text-slate-900">{formatCurrency(currentPrice, product.currency, "en-US", { maximumFractionDigits: 2 })}</p>
-            </div>
-            {/* Alert diff banner */}
-            {localAlertPrice !== null && (
-              <div className={`mx-6 my-3 rounded-2xl px-4 py-3 ${isTargetMet ? "bg-green-50" : "bg-amber-50"}`}>
-                {isTargetMet ? (
-                  <div className="flex items-center gap-2">
-                    <CheckCircle2 className="size-4 text-green-600 shrink-0" />
-                    <div>
-                      <p className="text-sm font-semibold text-green-800">Target price reached!</p>
-                      <p className="text-xs text-green-600">At or below your alert of {formatCurrency(localAlertPrice, product.currency, "en-US", { maximumFractionDigits: 2 })}</p>
-                    </div>
-                  </div>
+                {product.image_url ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={product.image_url}
+                    alt={product.name}
+                    className="max-h-[200px] max-w-[85%] object-contain transition-transform duration-500 hover:scale-[1.05]"
+                  />
                 ) : (
-                  <div className="flex items-center gap-2">
-                    <Target className="size-4 text-amber-600 shrink-0" />
-                    <div>
-                      <p className="text-sm font-semibold text-amber-800">{formatCurrency(Math.abs(diff!), product.currency, "en-US", { maximumFractionDigits: 2 })} away from target</p>
-                      <p className="text-xs text-amber-600">Alert set at {formatCurrency(localAlertPrice, product.currency, "en-US", { maximumFractionDigits: 2 })}</p>
-                    </div>
+                  <div className="flex h-[180px] w-full items-center justify-center">
+                    <TrendingDown className="size-10 text-slate-300" />
                   </div>
                 )}
               </div>
-            )}
-            {/* View/Delete buttons */}
-            <div className="flex w-full items-center gap-2 px-6 pt-1 pb-2">
-              <Button variant="default" asChild className="flex-1 gap-1.5 rounded-xl h-11" size="sm">
-                <a href={product.url} target="_blank" rel="noopener noreferrer">
-                  <ExternalLink className="size-3.5" />
-                  View on {source.label}
-                </a>
-              </Button>
-              <Button variant="outline" size="sm" onClick={handleDelete} disabled={deleting} className="h-11 w-11 shrink-0 rounded-xl p-0 text-red-500 hover:bg-red-50 border-red-200">
-                <Trash2 className="size-4" />
-              </Button>
-            </div>
-            {/* Alert price setter */}
-            <div className="mt-auto w-full px-6 pb-6">
-              <div className="rounded-2xl bg-slate-50 p-3.5">
-                <p className="mb-2 flex items-center gap-1.5 text-xs font-medium text-slate-500">
-                  <Bell className="size-3.5" />
-                  {localAlertPrice ? "Update alert price" : "Set price alert"}
-                </p>
-                <div className="flex gap-2">
-                  <Input type="number" value={alertInput} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setAlertInput(e.target.value)} placeholder="Target price..." className="h-10 text-sm bg-white" inputMode="decimal" />
-                  <Button variant="default" size="sm" onClick={handleSaveAlert} disabled={savingAlert} className="h-10 shrink-0 px-4">{savingAlert ? "Saving..." : localAlertPrice ? "Update" : "Set alert"}</Button>
+              {/* Source badge + name */}
+              <div className="w-full px-5 pt-4">
+                <span className={`inline-block rounded-full border px-2.5 py-0.5 text-xs font-medium ${source.className}`}>{source.label}</span>
+                <h2 className="mt-1.5 line-clamp-2 text-xl font-bold leading-snug text-slate-900">{product.name}</h2>
+              </div>
+              {/* Price */}
+              <div className="w-full px-5 pt-2 pb-1">
+                <p className="text-3xl font-bold tracking-tight text-slate-900">{formatCurrency(currentPrice, product.currency, "en-US", { maximumFractionDigits: 2 })}</p>
+              </div>
+              {/* Alert diff banner */}
+              {localAlertPrice !== null && (
+                <div className={`mx-5 my-3 rounded-xl px-3 py-2.5 ${isTargetMet ? "bg-green-50" : "bg-amber-50"}`}>
+                  {isTargetMet ? (
+                    <div className="flex items-center gap-2">
+                      <CheckCircle2 className="size-4 text-green-600 shrink-0" />
+                      <div>
+                        <p className="text-sm font-semibold text-green-800">Target price reached!</p>
+                        <p className="text-xs text-green-600">At or below your alert of {formatCurrency(localAlertPrice, product.currency, "en-US", { maximumFractionDigits: 2 })}</p>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-2">
+                      <Target className="size-4 text-amber-600 shrink-0" />
+                      <div>
+                        <p className="text-sm font-semibold text-amber-800">{formatCurrency(Math.abs(diff!), product.currency, "en-US", { maximumFractionDigits: 2 })} away from target</p>
+                        <p className="text-xs text-amber-600">Alert set at {formatCurrency(localAlertPrice, product.currency, "en-US", { maximumFractionDigits: 2 })}</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+              {/* View/Delete buttons */}
+              <div className="flex w-full items-center gap-2 px-5 pt-2 pb-2">
+                <Button variant="default" asChild className="flex-1 gap-1.5 rounded-xl h-10" size="sm">
+                  <a href={product.url} target="_blank" rel="noopener noreferrer">
+                    <ExternalLink className="size-3.5" />
+                    View on {source.label}
+                  </a>
+                </Button>
+                <Button variant="outline" size="sm" onClick={handleDelete} disabled={deleting} className="h-10 w-10 shrink-0 rounded-xl p-0 text-red-500 hover:bg-red-50 border-red-200">
+                  <Trash2 className="size-4" />
+                </Button>
+              </div>
+              {/* Alert price setter */}
+              <div className="w-full px-5 pb-5 pt-1">
+                <div className="rounded-xl bg-slate-50 p-3">
+                  <p className="mb-2 flex items-center gap-1.5 text-xs font-medium text-slate-500">
+                    <Bell className="size-3.5" />
+                    {localAlertPrice ? "Update alert price" : "Set price alert"}
+                  </p>
+                  <div className="flex gap-2">
+                    <Input type="number" value={alertInput} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setAlertInput(e.target.value)} placeholder="Target price..." className="h-9 text-sm bg-white" inputMode="decimal" />
+                    <Button variant="default" size="sm" onClick={handleSaveAlert} disabled={savingAlert} className="h-9 shrink-0 px-4">{savingAlert ? "Saving..." : localAlertPrice ? "Update" : "Set alert"}</Button>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-          {/* Right: chart/prices */}
-          <div className="flex-1 flex flex-col min-w-0 bg-slate-50/35">
-            <div className="flex-1 flex flex-col p-6 pb-0 min-h-0">
-              <div className="flex-1 min-h-0">
-                <PriceChart productId={product.id} currentPrice={currentPrice} currentCurrency={product.currency} />
+            {/* Right: chart/prices */}
+            <div className="flex-1 flex flex-col min-w-0 bg-slate-50/40 md:border-l md:border-slate-100">
+              <div className="flex-1 flex flex-col p-5 pb-0 min-h-0">
+                <div className="flex-1 min-h-0">
+                  <PriceChart productId={product.id} currentPrice={currentPrice} currentCurrency={product.currency} />
+                </div>
               </div>
-            </div>
-            {/* Should you buy — always at bottom */}
-            <div className="p-5 bg-white/90">
-              <div className="text-center text-base font-semibold text-slate-900">Should you buy?</div>
-              <div className="mt-1 text-center text-sm text-slate-600">This price is {diff !== null && diff <= 0 ? "at or below" : "above"} your target. {diff !== null && diff <= 0 ? "Great time to buy!" : "Consider waiting for a better deal."}</div>
+              {/* Should you buy — always at bottom */}
+              <div className="p-4 bg-white/80">
+                <div className="text-center text-sm font-semibold text-slate-900">Should you buy?</div>
+                <div className="mt-1 text-center text-xs text-slate-500">This price is {diff !== null && diff <= 0 ? "at or below" : "above"} your target. {diff !== null && diff <= 0 ? "Great time to buy!" : "Consider waiting for a better deal."}</div>
+              </div>
             </div>
           </div>
         </div>
