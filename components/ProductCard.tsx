@@ -64,13 +64,13 @@ export default function ProductCard({ product }: Props) {
         </div>
 
         {/* Card info — bottom half */}
-        <div className="flex flex-col justify-between px-4 py-3 gap-2 flex-1">
-          {/* Product name — single line, truncated */}
-          <p className="truncate text-sm font-semibold text-slate-900">
+        <div className="flex flex-col justify-between px-4 py-3 flex-1">
+          {/* Product name — two lines max, then truncate */}
+          <p className="line-clamp-2 text-sm font-semibold text-slate-900 leading-snug">
             {product.name}
           </p>
 
-          <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center justify-between gap-2 mt-auto pt-2">
             <span className="text-lg font-bold tracking-tight text-slate-900">
               {formatPrice(currentPrice, product.currency)}
             </span>
