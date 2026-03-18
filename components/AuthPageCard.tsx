@@ -6,7 +6,9 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
-import { Loader2 } from "lucide-react";
+import Image from "next/image";
+import Logo from "@/app/logo.png";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 interface AuthPageCardProps {
@@ -19,12 +21,13 @@ export default function AuthPageCard({ mode }: AuthPageCardProps) {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const isSignUp = mode === "sign-up";
 
   const title = useMemo(
-    () => (isSignUp ? "Create your account" : "Welcome back"),
+    () => (isSignUp ? "Create an Account" : "Login to your account"),
     [isSignUp],
   );
 
@@ -32,7 +35,7 @@ export default function AuthPageCard({ mode }: AuthPageCardProps) {
     () =>
       isSignUp
         ? "Start tracking products and get instant drop alerts."
-        : "Sign in to continue tracking your products.",
+        : "Welcome back! Sign in to continue tracking your products.",
     [isSignUp],
   );
 
@@ -100,44 +103,80 @@ export default function AuthPageCard({ mode }: AuthPageCardProps) {
   };
 
   return (
-    <div className="relative h-screen w-screen overflow-hidden flex items-center justify-center bg-[#f8fafc] px-6">
+    <div className="relative flex min-h-screen w-full items-center justify-center bg-[#f8fafc] px-6">
       <div className="pointer-events-none absolute inset-0">
-        <div className="absolute -top-40 -right-40 h-[500px] w-[500px] rounded-full bg-blue-200/20 blur-3xl" />
+        <div className="absolute -right-40 -top-40 h-[500px] w-[500px] rounded-full bg-blue-200/20 blur-3xl" />
         <div className="absolute -bottom-40 -left-40 h-[400px] w-[400px] rounded-full bg-blue-100/30 blur-3xl" />
       </div>
 
-      <div className="relative z-10 w-full max-w-sm rounded-sm border border-gray-200 bg-white p-7 shadow-sm">
-        <p className="text-sm font-semibold text-blue-600">better deals</p>
-        <h1 className="mt-2 text-2xl font-semibold text-gray-900">{title}</h1>
-        <p className="mt-2 text-sm text-gray-500">{subtitle}</p>
+      <div className="relative z-10 w-full max-w-md px-8 py-10">
+        <Link href="/" className="mb-6 flex items-center justify-center gap-3">
+          <Image src={Logo} alt="better deals logo" width={38} height={38} className="rounded-md" />
+          <span className="text-2xl font-medium tracking-tight text-gray-900">better deals</span>
+        </Link>
+        <h1 className="mt-3 text-center text-2xl font-bold text-gray-900">{title}</h1>
+        <p className="mt-1.5 text-center text-sm text-gray-500">{subtitle}</p>
 
-        <form className="mt-6 space-y-3" onSubmit={handleSubmit}>
-          <Input
-            type="email"
-            value={email}
-            onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-              setEmail(event.target.value)
-            }
-            placeholder="you@example.com"
-            className="h-12"
-            disabled={loading}
-          />
-          <Input
-            type="password"
-            value={password}
-            onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-              setPassword(event.target.value)
-            }
-            placeholder="Password"
-            className="h-12"
-            disabled={loading}
-          />
+        <form className="mt-7 space-y-4" onSubmit={handleSubmit}>
+          <div>
+            <label
+              htmlFor="email"
+              className="mb-1.5 block text-xs font-semibold text-gray-700"
+            >
+              Email Address
+            </label>
+            <Input
+              id="email"
+              type="email"
+              value={email}
+              onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+                setEmail(event.target.value)
+              }
+              placeholder="Enter your email address"
+              className="h-11 rounded-lg border-gray-200 bg-gray-50 text-sm placeholder:text-gray-400 focus-visible:border-blue-400 focus-visible:ring-blue-400/20"
+              disabled={loading}
+            />
+          </div>
+
+          <div>
+            <label
+              htmlFor="password"
+              className="mb-1.5 block text-xs font-semibold text-gray-700"
+            >
+              Password
+            </label>
+            <div className="relative">
+              <Input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                value={password}
+                onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+                  setPassword(event.target.value)
+                }
+                placeholder="Enter your password"
+                className="h-11 rounded-lg border-gray-200 bg-gray-50 pr-10 text-sm placeholder:text-gray-400 focus-visible:border-blue-400 focus-visible:ring-blue-400/20"
+                disabled={loading}
+              />
+              <button
+                type="button"
+                tabIndex={-1}
+                onClick={() => setShowPassword((prev) => !prev)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              >
+                {showPassword ? (
+                  <EyeOff className="size-4" />
+                ) : (
+                  <Eye className="size-4" />
+                )}
+              </button>
+            </div>
+          </div>
 
           <Button
             type="submit"
             variant="default"
             size="lg"
-            className="h-12 w-full bg-gradient-to-b from-sky-300 to-blue-500 text-white shadow-[0_4px_14px_rgba(56,189,248,0.45)] transition-all hover:scale-[1.01] hover:shadow-[0_6px_20px_rgba(56,189,248,0.55)]"
+            className="h-11 w-full rounded-lg border border-blue-500 bg-linear-to-b from-sky-300 to-blue-500 text-sm font-semibold text-white shadow-[0_4px_14px_rgba(56,189,248,0.45)] transition-all hover:scale-[1.02] hover:shadow-[0_6px_20px_rgba(56,189,248,0.55)]"
             disabled={loading}
           >
             {loading ? (
@@ -146,20 +185,26 @@ export default function AuthPageCard({ mode }: AuthPageCardProps) {
                 Please wait...
               </>
             ) : isSignUp ? (
-              "Create account"
+              "Create Account"
             ) : (
-              "Sign in"
+              "Login"
             )}
           </Button>
         </form>
 
-        <div className="my-4 text-center text-xs text-gray-400">or continue with</div>
+        <div className="my-5 flex items-center gap-3">
+          <div className="h-px flex-1 bg-gray-200" />
+          <span className="text-[11px] font-semibold uppercase tracking-wider text-gray-400">
+            Or authorize with
+          </span>
+          <div className="h-px flex-1 bg-gray-200" />
+        </div>
 
         <Button
           type="button"
           variant="outline"
           size="lg"
-          className="h-12 w-full gap-2"
+          className="h-11 w-full gap-2.5 rounded-lg border-gray-200 text-sm font-medium text-gray-700 hover:bg-gray-50"
           disabled={loading}
           onClick={handleGoogle}
         >
@@ -184,11 +229,13 @@ export default function AuthPageCard({ mode }: AuthPageCardProps) {
           Google
         </Button>
 
-        <p className="mt-6 text-center text-sm text-gray-400">
-          {isSignUp ? "Already have an account?" : "Don\'t have an account?"}{" "}
+        <p className="mt-7 text-center text-sm text-gray-500">
+          {isSignUp
+            ? "Already have an account?"
+            : "Don\u2019t have an account?"}{" "}
           <Link
             href={isSignUp ? "/sign-in" : "/sign-up"}
-            className="font-semibold text-gray-900 hover:underline"
+            className="font-semibold text-blue-600 hover:underline"
           >
             {isSignUp ? "Sign in" : "Sign up"}
           </Link>

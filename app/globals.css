@@ -122,3 +122,44 @@
     font-weight: 500;
   }
 }
+
+/* ── Hero card ────────────────────────────────────────────── */
+.hero-card {
+  position: relative;
+}
+
+/* ── Scroll-reveal for product cards ─────────────────────── */
+@keyframes hero-card-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(28px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.hero-product-card {
+  animation: hero-card-reveal 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.hero-product-card:nth-child(1) {
+  animation-delay: 0.1s;
+}
+
+.hero-product-card:nth-child(2) {
+  animation-delay: 0.25s;
+}
+
+.hero-product-card:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-product-card {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}

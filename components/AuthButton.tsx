@@ -25,7 +25,7 @@ export default function AuthButton({ user }: { user: User | null }) {
 
   return (
     <div className="flex items-center gap-2">
-      <Button variant="ghost" size="sm" className="h-9 underline" asChild>
+      <Button variant="ghost" size="sm" className="h-9 px-3 text-gray-700 hover:bg-white/60 hover:text-gray-900" asChild>
         <Link href="/sign-in">
           Login
         </Link>
@@ -33,7 +33,7 @@ export default function AuthButton({ user }: { user: User | null }) {
       <Button
         variant="default"
         size="sm"
-        className="h-9 bg-gradient-to-b from-sky-300 to-blue-500 text-white shadow-[0_4px_14px_rgba(56,189,248,0.45)] transition-all hover:scale-[1.01] hover:shadow-[0_6px_20px_rgba(56,189,248,0.55)]"
+        className="h-9 rounded-xl border border-blue-500 bg-linear-to-b from-sky-300 to-blue-500 px-4 text-white shadow-[0_4px_14px_rgba(56,189,248,0.45)] transition-all duration-200 hover:scale-[1.01] hover:shadow-[0_6px_20px_rgba(56,189,248,0.55)]"
         asChild
       >
         <Link href="/sign-up">Sign Up</Link>

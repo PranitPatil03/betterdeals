@@ -18,6 +18,13 @@ import { toast } from "sonner";
 
 type RangeKey = "1M" | "3M" | "6M" | "ALL";
 
+const RANGE_WINDOW_DAYS: Record<RangeKey, number> = {
+  "1M": 30,
+  "3M": 90,
+  "6M": 180,
+  ALL: 36500,
+};
+
 interface ChartPoint {
   date: string;
   ts: number;
@@ -76,19 +83,12 @@ export default function PriceChart({
 
     loadData();
   }, [productId]);
-
   const filteredData = useMemo(() => {
-    if (range === "ALL") return data;
+    if (range === "ALL" || data.length === 0) return data;
 
-    const days = {
-      "1M": 30,
-      "3M": 90,
-      "6M": 180,
-      ALL: 36500,
-    }[range];
-
-    const cutoff = Date.now() - days * 24 * 60 * 60 * 1000;
-    const recent = data.filter((point) => point.ts >= cutoff);
+    const latestTimestamp = data[data.length - 1]?.ts ?? 0;
+    const cutoffTs = latestTimestamp - RANGE_WINDOW_DAYS[range] * 24 * 60 * 60 * 1000;
+    const recent = data.filter((point) => point.ts >= cutoffTs);
     return recent.length > 1 ? recent : data;
   }, [data, range]);
 
@@ -146,11 +146,10 @@ export default function PriceChart({
               key={key}
               type="button"
               onClick={() => setRange(key)}
-              className={`rounded-full px-2.5 py-1 text-xs font-medium transition-colors ${
-                range === key
+              className={`rounded-full px-2.5 py-1 text-xs font-medium transition-colors ${range === key
                   ? "bg-blue-600 text-white"
                   : "text-gray-500 hover:bg-gray-100"
-              }`}
+                }`}
             >
               {key}
             </button>
