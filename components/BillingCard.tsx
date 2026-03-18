@@ -70,7 +70,7 @@ export default function BillingCard({
   const canManageBilling = !!status && status !== "canceled";
 
   return (
-    <div className="rounded-sm border border-gray-950/[.08] bg-white p-4 text-left shadow-sm">
+    <div className="rounded-sm border border-gray-950/8 bg-white p-4 text-left shadow-sm">
       <div className="flex items-center justify-between gap-3 mb-2">
         <h3 className="text-sm font-semibold text-gray-900">Your Plan</h3>
         <Badge variant={isPro ? "default" : "secondary"} className="text-xs">
@@ -95,7 +95,7 @@ export default function BillingCard({
           <Button
             variant="default"
             size="default"
-            className="bg-gradient-to-b from-blue-400 to-blue-600 text-white shadow-[0_4px_14px_rgba(37,99,235,0.35)] transition-all hover:scale-[1.01] hover:shadow-[0_6px_20px_rgba(37,99,235,0.5)]"
+            className="bg-linear-to-b from-blue-400 to-blue-600 text-white shadow-[0_4px_14px_rgba(37,99,235,0.35)] transition-all hover:scale-[1.01] hover:shadow-[0_6px_20px_rgba(37,99,235,0.5)]"
             onClick={handleCheckout}
             disabled={loadingAction !== null}
           >

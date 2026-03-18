@@ -187,6 +187,40 @@ export async function getPriceHistory(
   }
 }
 
+export async function setAlertPrice(
+  productId: string,
+  price: number,
+): Promise<{ success?: boolean; error?: string }> {
+  try {
+    if (!Number.isFinite(price) || price <= 0) {
+      return { error: "Alert price must be a positive number" };
+    }
+
+    const normalizedPrice = Number(price.toFixed(2));
+
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) return { error: "Not authenticated" };
+
+    const { error } = await supabase
+      .from("products")
+      .update({ alert_price: normalizedPrice, updated_at: new Date().toISOString() })
+      .eq("id", productId)
+      .eq("user_id", user.id);
+
+    if (error) throw error;
+
+    revalidatePath("/");
+    revalidatePath("/dashboard");
+    return { success: true };
+  } catch (error) {
+    return { error: error instanceof Error ? error.message : "Failed to save alert" };
+  }
+}
+
 export async function signOut() {
   const supabase = await createClient();
   await supabase.auth.signOut();

@@ -27,7 +27,7 @@ export default async function DashboardPage() {
     <main className="min-h-screen bg-[#f8fafc]">
       <DashboardHeader user={user} tier={billing.tier} />
 
-      <div className="mx-auto max-w-screen-xl px-6 py-8">
+      <div className="mx-auto max-w-7xl px-6 py-8">
         {/* Page heading + input together */}
         <div className="mb-8">
           <h1 className="text-3xl font-semibold tracking-tight text-gray-900">

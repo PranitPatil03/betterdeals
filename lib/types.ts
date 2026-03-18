@@ -36,6 +36,7 @@ export interface ProductRecord {
   current_price: number | string;
   currency: string;
   image_url: string | null;
+  alert_price: number | string | null;
   created_at?: string;
   updated_at?: string;
 }

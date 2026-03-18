@@ -10,7 +10,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import { getPriceHistory } from "@/app/actions";
+import { getPriceHistory, setAlertPrice } from "@/app/actions";
 import { ArrowDownRight, ArrowUpRight, Clock3, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -53,15 +53,20 @@ export default function PriceChart({
   productId,
   currentPrice,
   currentCurrency,
+  initialAlertPrice,
 }: {
   productId: string;
   currentPrice?: number;
   currentCurrency?: string;
+  initialAlertPrice?: number | null;
 }) {
   const [data, setData] = useState<ChartPoint[]>([]);
   const [loading, setLoading] = useState(true);
   const [range, setRange] = useState<RangeKey>("3M");
-  const [alertTarget, setAlertTarget] = useState("");
+  const [alertTarget, setAlertTarget] = useState(
+    initialAlertPrice ? String(initialAlertPrice) : "",
+  );
+  const [savingAlert, setSavingAlert] = useState(false);
 
   useEffect(() => {
     async function loadData() {
@@ -75,14 +80,14 @@ export default function PriceChart({
       }));
 
       setData(chartData);
-      if (chartData.length > 0) {
+      if (!initialAlertPrice && chartData.length > 0) {
         setAlertTarget(String(Math.round(chartData[chartData.length - 1].price)));
       }
       setLoading(false);
     }
 
     loadData();
-  }, [productId]);
+  }, [productId, initialAlertPrice]);
   const filteredData = useMemo(() => {
     if (range === "ALL" || data.length === 0) return data;
 
@@ -108,14 +113,17 @@ export default function PriceChart({
   const recommendation =
     latest <= average * 0.96 ? "Buy Now" : latest <= average * 1.04 ? "Good time" : "Wait";
 
-  const handleSaveAlert = () => {
+  const handleSaveAlert = async () => {
     const parsed = Number(alertTarget);
     if (!Number.isFinite(parsed) || parsed <= 0) {
       toast.error("Enter a valid target price.");
       return;
     }
-
-    toast.success("Price alert target saved (UI preview).");
+    setSavingAlert(true);
+    const res = await setAlertPrice(productId, parsed);
+    setSavingAlert(false);
+    if (res.error) toast.error(res.error);
+    else toast.success("Price alert saved!");
   };
 
   if (loading) {
@@ -147,8 +155,8 @@ export default function PriceChart({
               type="button"
               onClick={() => setRange(key)}
               className={`rounded-full px-2.5 py-1 text-xs font-medium transition-colors ${range === key
-                  ? "bg-blue-600 text-white"
-                  : "text-gray-500 hover:bg-gray-100"
+                ? "bg-blue-600 text-white"
+                : "text-gray-500 hover:bg-gray-100"
                 }`}
             >
               {key}
@@ -259,9 +267,10 @@ export default function PriceChart({
             variant="default"
             size="sm"
             onClick={handleSaveAlert}
+            disabled={savingAlert}
             className="h-10 sm:min-w-36"
           >
-            Set price alert
+            {savingAlert ? "Saving..." : "Set price alert"}
           </Button>
         </div>
       </div>
