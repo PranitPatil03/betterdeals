@@ -128,6 +128,87 @@ export default async function Home() {
           </div>
         </div>
 
+        <div className="relative z-10 mx-auto mt-16 w-full max-w-5xl px-2 md:px-4">
+          <div className="hero-card p-6  md:p-8">
+            <p className="mb-5 text-left text-sm font-semibold uppercase tracking-[0.14em] text-gray-400">
+              Tracking products..
+            </p>
+
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+              {/* Zara Dress */}
+              <article className="hero-product-card group relative overflow-hidden rounded-xl border border-gray-100 bg-white p-4 shadow-sm transition hover:shadow-md">
+                <div className="flex h-56 items-center justify-center rounded-lg bg-gray-50 p-3">
+                  <Image
+                    src="/images/zaradress.png"
+                    alt="Zara dress"
+                    width={400}
+                    height={600}
+                    className="h-full w-auto object-contain"
+                  />
+                </div>
+                <div className="mt-3">
+                  <p className="text-sm font-semibold text-gray-900">Zara Midi Dress</p>
+                  <div className="mt-2 flex items-baseline justify-between">
+                    <span className="text-lg font-bold text-gray-900">$49.90</span>
+                    <span className="rounded-full bg-sky-50 px-2 py-0.5 text-[11px] font-semibold text-sky-600">Alert price: $39</span>
+                  </div>
+                  <div className="mt-2.5 flex items-center gap-1.5">
+                    <span className="size-1.5 rounded-full bg-amber-400" />
+                    <span className="text-[11px] text-gray-500">Waiting for drop — 80% to alert</span>
+                  </div>
+                </div>
+              </article>
+
+              {/* MacBook Air */}
+              <article className="hero-product-card group relative overflow-hidden rounded-xl border border-gray-100 bg-white p-4 shadow-sm transition hover:shadow-md">
+                <div className="flex h-56 items-center justify-center rounded-lg bg-gray-50 p-3">
+                  <Image
+                    src="/images/macbook.png"
+                    alt="MacBook"
+                    width={400}
+                    height={400}
+                    className="h-full w-auto object-contain"
+                  />
+                </div>
+                <div className="mt-3">
+                  <p className="text-sm font-semibold text-gray-900">MacBook Air M3</p>
+                  <div className="mt-2 flex items-baseline justify-between">
+                    <span className="text-lg font-bold text-gray-900">$1,049</span>
+                    <span className="rounded-full bg-sky-50 px-2 py-0.5 text-[11px] font-semibold text-sky-600">Alert price: $949</span>
+                  </div>
+                  <div className="mt-2.5 flex items-center gap-1.5">
+                    <span className="size-1.5 rounded-full bg-green-500" />
+                    <span className="text-[11px] text-gray-500">Emailed alert — target reached</span>
+                  </div>
+                </div>
+              </article>
+
+              {/* Seiko Watch */}
+              <article className="hero-product-card group relative overflow-hidden rounded-xl border border-gray-100 bg-white p-4 shadow-sm transition hover:shadow-md">
+                <div className="flex h-56 items-center justify-center rounded-lg bg-gray-50 p-3">
+                  <Image
+                    src="/images/seiko.png"
+                    alt="Seiko watch"
+                    width={400}
+                    height={400}
+                    className="h-full w-auto object-contain"
+                  />
+                </div>
+                <div className="mt-3">
+                  <p className="text-sm font-semibold text-gray-900">Seiko Presage</p>
+                  <div className="mt-2 flex items-baseline justify-between">
+                    <span className="text-lg font-bold text-gray-900">$425</span>
+                    <span className="rounded-full bg-sky-50 px-2 py-0.5 text-[11px] font-semibold text-sky-600">Alert price: $380</span>
+                  </div>
+                  <div className="mt-2.5 flex items-center gap-1.5">
+                    <span className="size-1.5 rounded-full bg-amber-400" />
+                    <span className="text-[11px] text-gray-500">Waiting for drop — 90% to alert</span>
+                  </div>
+                </div>
+              </article>
+            </div>
+          </div>
+        </div>
       </section>
 
       <section id="features" className="relative px-6 py-24 md:py-28">
