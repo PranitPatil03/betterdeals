@@ -1,6 +1,6 @@
 "use client";
 
-import { Plus, TrendingDown } from "lucide-react";
+import { TrendingDown } from "lucide-react";
 import ProductCard from "@/components/ProductCard";
 import type { ProductRecord } from "@/lib/types";
 
@@ -12,10 +12,7 @@ export default function DashboardView({ products }: Props) {
   if (products.length === 0) {
     return (
       <div className="mt-10 rounded-2xl border-2 border-dashed border-slate-200 bg-white px-8 py-16 text-center">
-        <div className="mx-auto flex size-16 items-center justify-center rounded-full bg-slate-100">
-          <Plus className="size-7 text-slate-400" strokeWidth={1.5} />
-        </div>
-        <h3 className="mt-5 text-lg font-semibold text-slate-900">
+        <h3 className="text-lg font-semibold text-slate-900">
           Add your first product
         </h3>
         <p className="mt-2 max-w-sm mx-auto text-sm text-slate-500">

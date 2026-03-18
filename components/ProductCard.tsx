@@ -28,8 +28,10 @@ export default function ProductCard({ product }: Props) {
   const source = getSourceBadge(hostname);
   const currentPrice = Number(product.current_price);
   const alertPrice = product.alert_price ? Number(product.alert_price) : null;
+  // Alert is only valid when alert_price < current_price
+  const alertIsValid = alertPrice !== null && alertPrice < currentPrice;
   const diff = alertPrice !== null ? currentPrice - alertPrice : null;
-  const isTargetMet = diff !== null && diff <= 0;
+  const isTargetMet = alertPrice !== null && currentPrice <= alertPrice && alertIsValid;
 
   return (
     <>
@@ -37,7 +39,7 @@ export default function ProductCard({ product }: Props) {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="group text-left w-full overflow-hidden rounded-2xl bg-white shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 flex flex-col"
+        className="group text-left w-full min-h-[280px] overflow-hidden rounded-2xl bg-white shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 flex flex-col"
       >
         {/* Product image — top half */}
         <div className="relative h-[160px] flex items-center justify-center">
@@ -79,7 +81,7 @@ export default function ProductCard({ product }: Props) {
             </div>
           </div>
           {/* Alert text below price */}
-          {alertPrice !== null && (
+          {alertPrice !== null && alertIsValid && (
             <div className="mt-1 text-xs font-medium text-slate-700">
               {isTargetMet ? (
                 <span className="text-green-700">Target reached. Great time to buy.</span>

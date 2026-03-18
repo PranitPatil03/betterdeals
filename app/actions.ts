@@ -206,6 +206,22 @@ export async function setAlertPrice(
 
     if (!user) return { error: "Not authenticated" };
 
+    // Validate alert price is lower than the current product price
+    const { data: productData, error: fetchError } = await supabase
+      .from("products")
+      .select("current_price")
+      .eq("id", productId)
+      .eq("user_id", user.id)
+      .single<{ current_price: number }>();
+
+    if (fetchError || !productData) {
+      return { error: "Product not found" };
+    }
+
+    if (normalizedPrice >= Number(productData.current_price)) {
+      return { error: "Alert price must be lower than the current price" };
+    }
+
     const { error } = await supabase
       .from("products")
       .update({ alert_price: normalizedPrice, updated_at: new Date().toISOString() })

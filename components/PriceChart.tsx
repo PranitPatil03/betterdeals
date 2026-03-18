@@ -108,11 +108,7 @@ export default function PriceChart({
   }
 
   if (data.length === 0) {
-    return (
-      <div className="text-center py-8 text-gray-500 w-full rounded-xl bg-white/90">
-        No price history yet. Check back after the first daily update!
-      </div>
-    );
+    return null;
   }
 
   return (

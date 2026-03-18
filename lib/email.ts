@@ -102,9 +102,9 @@ export async function sendPriceDropAlert(
       <td align="center">
         <table role="presentation" width="620" cellpadding="0" cellspacing="0" style="max-width:620px;width:100%;border-radius:20px;overflow:hidden;background:#ffffff;box-shadow:0 10px 30px rgba(15,23,42,0.08);">
           <tr>
-            <td style="padding:22px 28px 18px 28px;background:linear-gradient(135deg,#0f172a 0%,#1d4ed8 100%);">
+            <td style="padding:22px 28px 18px 28px;background:linear-gradient(180deg,#7dd3fc 0%,#3b82f6 100%);">
               <div style="font-size:22px;font-weight:700;color:#ffffff;letter-spacing:0.2px;">Better Deals</div>
-              <div style="font-size:13px;color:#dbeafe;margin-top:4px;">Smart price tracking and drop alerts</div>
+              <div style="font-size:13px;color:#eff6ff;margin-top:4px;">Smart price tracking and drop alerts</div>
             </td>
           </tr>
 
