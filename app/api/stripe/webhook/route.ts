@@ -126,6 +126,8 @@ export async function POST(request: Request) {
   }
 
   try {
+    console.log("[stripe-webhook] Event received:", event.type);
+
     if (event.type === "checkout.session.completed") {
       const session = event.data.object as Stripe.Checkout.Session;
       const subscriptionId =
@@ -137,6 +139,8 @@ export async function POST(request: Request) {
           ? session.customer
           : session.customer?.id ?? null;
 
+      console.log("[stripe-webhook] checkout.session.completed — subscriptionId:", subscriptionId, "customerId:", customerId);
+
       if (subscriptionId) {
         const subscription = await stripe.subscriptions.retrieve(subscriptionId);
         const userId =
@@ -144,6 +148,8 @@ export async function POST(request: Request) {
           session.metadata?.user_id ||
           subscription.metadata?.user_id ||
           (await resolveUserIdByStripeIds(subscription.id, customerId));
+
+        console.log("[stripe-webhook] Resolved userId:", userId);
 
         if (userId) {
           await upsertSubscriptionFromStripe(userId, subscription);
@@ -153,8 +159,10 @@ export async function POST(request: Request) {
           if (supabaseAdmin) {
             const { data: userData } = await supabaseAdmin.auth.admin.getUserById(userId);
             const email = userData?.user?.email;
+            console.log("[stripe-webhook] Sending upgrade email to:", email);
             if (email) {
-              await sendUpgradeConfirmation(email, { planName: "Pro" });
+              const emailResult = await sendUpgradeConfirmation(email, { planName: "Pro" });
+              console.log("[stripe-webhook] Email result:", emailResult);
             }
           }
         }
@@ -178,6 +186,19 @@ export async function POST(request: Request) {
 
       if (userId) {
         await upsertSubscriptionFromStripe(userId, subscription);
+
+        // Send upgrade email on new subscription creation as well
+        if (event.type === "customer.subscription.created" && subscription.status === "active") {
+          const supabaseAdmin = getSupabaseAdmin();
+          if (supabaseAdmin) {
+            const { data: userData } = await supabaseAdmin.auth.admin.getUserById(userId);
+            const email = userData?.user?.email;
+            if (email) {
+              console.log("[stripe-webhook] Sending upgrade email (sub.created) to:", email);
+              await sendUpgradeConfirmation(email, { planName: "Pro" });
+            }
+          }
+        }
       }
     }
 
