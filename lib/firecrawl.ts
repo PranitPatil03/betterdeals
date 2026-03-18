@@ -1,5 +1,6 @@
 import FirecrawlApp from "@mendable/firecrawl-js";
 import { z } from "zod";
+import { normalizeCurrencyCode } from "@/lib/currency";
 
 const firecrawl = new FirecrawlApp({
   apiKey: process.env.FIRECRAWL_API_KEY,
@@ -90,9 +91,14 @@ export async function scrapeProduct(url: string): Promise<ScrapedProductData> {
 
     const imageFromExtract = normalizeImageUrl(extractedData.productImageUrl, url);
     const imageFromOg = imageFromExtract ? undefined : await fetchOgImage(url);
+    const normalizedCurrency = normalizeCurrencyCode(
+      extractedData.currencyCode,
+      "USD",
+    );
 
     return {
       ...extractedData,
+      currencyCode: normalizedCurrency,
       productImageUrl: imageFromExtract ?? imageFromOg,
     };
   } catch (error) {

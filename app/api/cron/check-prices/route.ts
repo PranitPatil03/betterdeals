@@ -3,6 +3,7 @@ import { createClient } from "@supabase/supabase-js";
 import { scrapeProduct } from "@/lib/firecrawl";
 import { sendPriceDropAlert } from "@/lib/email";
 import type { ProductRecord } from "@/lib/types";
+import { normalizeCurrencyCode } from "@/lib/currency";
 
 export async function POST(request: Request) {
   try {
@@ -78,10 +79,15 @@ export async function POST(request: Request) {
             ? parsedAlertPrice
             : null;
 
+        const resolvedCurrency = normalizeCurrencyCode(
+          productData.currencyCode || product.currency,
+          "USD",
+        );
+
         const updatedProduct = {
           ...product,
           current_price: newPrice,
-          currency: productData.currencyCode || product.currency,
+          currency: resolvedCurrency,
           name: productData.productName || product.name,
           image_url: productData.productImageUrl || product.image_url,
         };
@@ -105,7 +111,7 @@ export async function POST(request: Request) {
           const { error: historyError } = await supabase.from("price_history").insert({
             product_id: product.id,
             price: newPrice,
-            currency: productData.currencyCode || product.currency,
+            currency: resolvedCurrency,
           });
 
           if (historyError) {

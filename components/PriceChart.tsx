@@ -15,6 +15,7 @@ import { ArrowDownRight, ArrowUpRight, Clock3, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+import { formatCurrency } from "@/lib/currency";
 
 type RangeKey = "1M" | "3M" | "6M" | "ALL";
 
@@ -33,20 +34,16 @@ interface ChartPoint {
 }
 
 function formatPrice(value: number, currency: string): string {
-  return new Intl.NumberFormat("en-IN", {
-    style: "currency",
-    currency,
+  return formatCurrency(value, currency, "en-IN", {
     maximumFractionDigits: value >= 100 ? 0 : 2,
-  }).format(value);
+  });
 }
 
 function formatCompact(value: number, currency: string): string {
-  return new Intl.NumberFormat("en-IN", {
-    style: "currency",
-    currency,
+  return formatCurrency(value, currency, "en-IN", {
     notation: "compact",
     maximumFractionDigits: 1,
-  }).format(value);
+  });
 }
 
 export default function PriceChart({

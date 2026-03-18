@@ -7,6 +7,7 @@ import { FREE_PLAN_PRODUCT_LIMIT } from "@/lib/plans";
 import type { PriceHistoryRecord, ProductRecord } from "@/lib/types";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { normalizeCurrencyCode } from "@/lib/currency";
 
 type AddProductResult = {
   success?: boolean;
@@ -76,7 +77,7 @@ export async function addProduct(formData: FormData): Promise<AddProductResult> 
     }
 
     const newPrice = Number(productData.currentPrice);
-    const currency = productData.currencyCode || "USD";
+    const currency = normalizeCurrencyCode(productData.currencyCode, "USD");
 
     const isUpdate = !!existingProduct;
 

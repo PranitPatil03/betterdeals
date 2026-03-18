@@ -19,13 +19,12 @@ import { deleteProduct } from "@/app/actions";
 import { useState } from "react";
 import type { ProductRecord } from "@/lib/types";
 import { getSourceBadge } from "@/lib/product-source";
+import { formatCurrency } from "@/lib/currency";
 
 function formatPrice(price: number, currency: string): string {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency,
+  return formatCurrency(price, currency, "en-US", {
     maximumFractionDigits: 2,
-  }).format(price);
+  });
 }
 
 interface Props {
