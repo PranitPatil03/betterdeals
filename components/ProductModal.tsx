@@ -110,12 +110,29 @@ export default function ProductModal({ product, open, onClose }: Props) {
           {/* Details panel */}
           <div className="flex flex-1 flex-col gap-3 p-5 min-w-0">
 
-            {/* 1. Alert diff banner — shown only when alert is set */}
+            {/* 1. Source badge + product name */}
+            <div>
+              <span
+                className={`inline-block rounded-full border px-2.5 py-0.5 text-xs font-medium ${source.className}`}
+              >
+                {source.label}
+              </span>
+              <h2 className="mt-1.5 line-clamp-2 text-base font-bold leading-snug text-slate-900">
+                {product.name}
+              </h2>
+            </div>
+
+            {/* 2. Current price */}
+            <p className="text-2xl font-bold tracking-tight text-slate-900">
+              {formatPrice(currentPrice, product.currency)}
+            </p>
+
+            {/* 3. Alert diff banner — shown only when alert is set */}
             {localAlertPrice !== null && (
               <div
                 className={`rounded-xl px-4 py-3 ${isTargetMet
-                    ? "bg-green-50 border border-green-200"
-                    : "bg-amber-50 border border-amber-200"
+                  ? "bg-green-50 border border-green-200"
+                  : "bg-amber-50 border border-amber-200"
                   }`}
               >
                 {isTargetMet ? (
@@ -144,8 +161,32 @@ export default function ProductModal({ product, open, onClose }: Props) {
               </div>
             )}
 
-            {/* 2. Alert price setter / updater */}
-            <div className="rounded-xl border border-slate-200 bg-slate-50/60 p-3">
+            {/* 4. View on [Source] + Delete */}
+            <div className="flex items-center gap-2 pt-1">
+              <Button
+                variant="default"
+                asChild
+                className="flex-1 gap-1.5 rounded-xl h-9"
+                size="sm"
+              >
+                <a href={product.url} target="_blank" rel="noopener noreferrer">
+                  <ExternalLink className="size-3.5" />
+                  View on {source.label}
+                </a>
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleDelete}
+                disabled={deleting}
+                className="h-9 w-9 shrink-0 rounded-xl p-0 text-red-500 hover:bg-red-50 border-red-200"
+              >
+                <Trash2 className="size-4" />
+              </Button>
+            </div>
+
+            {/* 5. Alert price setter / updater — at the bottom */}
+            <div className="mt-auto rounded-xl border border-slate-200 bg-slate-50/60 p-3">
               <p className="mb-2 flex items-center gap-1.5 text-xs font-medium text-slate-500">
                 <Bell className="size-3.5" />
                 {localAlertPrice ? "Update alert price" : "Set price alert"}
@@ -171,47 +212,6 @@ export default function ProductModal({ product, open, onClose }: Props) {
                   {savingAlert ? "Saving…" : localAlertPrice ? "Update" : "Set alert"}
                 </Button>
               </div>
-            </div>
-
-            {/* 3. Source badge + product name */}
-            <div>
-              <span
-                className={`inline-block rounded-full border px-2.5 py-0.5 text-xs font-medium ${source.className}`}
-              >
-                {source.label}
-              </span>
-              <h2 className="mt-1.5 line-clamp-2 text-base font-bold leading-snug text-slate-900">
-                {product.name}
-              </h2>
-            </div>
-
-            {/* 4. Current price */}
-            <p className="text-2xl font-bold tracking-tight text-slate-900">
-              {formatPrice(currentPrice, product.currency)}
-            </p>
-
-            {/* 5. View on [Source] + Delete */}
-            <div className="mt-auto flex items-center gap-2 pt-1">
-              <Button
-                variant="default"
-                asChild
-                className="flex-1 gap-1.5 rounded-xl h-9"
-                size="sm"
-              >
-                <a href={product.url} target="_blank" rel="noopener noreferrer">
-                  <ExternalLink className="size-3.5" />
-                  View on {source.label}
-                </a>
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleDelete}
-                disabled={deleting}
-                className="h-9 w-9 shrink-0 rounded-xl p-0 text-red-500 hover:bg-red-50 border-red-200"
-              >
-                <Trash2 className="size-4" />
-              </Button>
             </div>
           </div>
         </div>
