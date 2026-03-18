@@ -165,8 +165,8 @@ export default function ProductModal({ product, open, onClose }: { product: Prod
                 </button>
               </div>
               {/* Alert price setter — below with border */}
-              <div className="w-full px-5 pb-5 pt-2">
-                <div className="rounded-xl border border-slate-200 bg-white p-3">
+              <div className="w-full px-5 pb-8 pt-2">
+                <div className="rounded-xl border bg-white p-3">
                   <p className="mb-2 flex items-center gap-1.5 text-xs font-medium text-slate-500">
                     <Bell className="size-3.5" />
                     {localAlertPrice ? "Update alert price" : "Set price alert"}
@@ -185,7 +185,7 @@ export default function ProductModal({ product, open, onClose }: { product: Prod
                 </div>
               </div>
             </div>
-            {/* Right: chart/prices — only shown when there is price history */}
+            {/* Right: chart/prices */}
             <div className="flex-1 flex flex-col min-w-0 bg-slate-50/40 md:border-l md:border-slate-100">
               <div className="flex-1 flex flex-col p-5 pb-0 min-h-0">
                 <div className="flex-1 min-h-0">

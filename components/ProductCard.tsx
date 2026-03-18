@@ -39,7 +39,7 @@ export default function ProductCard({ product }: Props) {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="group text-left w-full min-h-[280px] overflow-hidden rounded-2xl bg-white shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 flex flex-col"
+        className="group text-left w-full h-[290px] overflow-hidden rounded-2xl bg-white shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 flex flex-col"
       >
         {/* Product image — top half */}
         <div className="relative h-[160px] flex items-center justify-center">
@@ -64,7 +64,7 @@ export default function ProductCard({ product }: Props) {
         </div>
 
         {/* Card info — bottom half */}
-        <div className="flex flex-col justify-between px-4 py-3 gap-2 min-h-[90px]">
+        <div className="flex flex-col justify-between px-4 py-3 gap-2 flex-1">
           {/* Product name — single line, truncated */}
           <p className="truncate text-sm font-semibold text-slate-900">
             {product.name}

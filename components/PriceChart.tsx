@@ -100,15 +100,21 @@ export default function PriceChart({
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-8 text-gray-500 w-full">
-        <Loader2 className="w-5 h-5 animate-spin mr-2" />
-        Loading chart...
+      <div className="flex flex-col items-center justify-center py-16 text-gray-400 w-full h-full min-h-[300px]">
+        <Loader2 className="w-6 h-6 animate-spin mb-3" />
+        <p className="text-sm">Loading price history...</p>
       </div>
     );
   }
 
   if (data.length === 0) {
-    return null;
+    return (
+      <div className="flex flex-col items-center justify-center py-16 text-gray-400 w-full h-full min-h-[300px]">
+        <Clock3 className="size-8 mb-3 text-gray-300" />
+        <p className="text-sm font-medium text-gray-500">No price history yet</p>
+        <p className="mt-1 text-xs text-gray-400">Check back after the first daily price check</p>
+      </div>
+    );
   }
 
   return (
