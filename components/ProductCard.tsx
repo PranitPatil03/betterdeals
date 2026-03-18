@@ -37,7 +37,7 @@ export default function ProductCard({ product }: Props) {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="group text-left w-[260px] h-[260px] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 flex flex-col"
+        className="group text-left w-[260px] h-[260px] overflow-hidden rounded-2xl bg-white shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 flex flex-col"
       >
         {/* Product image — fixed square top half */}
         <div className="relative flex-1 min-h-0 flex items-center justify-center">
@@ -46,8 +46,8 @@ export default function ProductCard({ product }: Props) {
             <img
               src={product.image_url}
               alt={product.name}
-              className="max-h-[110px] max-w-[90%] object-contain p-2 transition-transform duration-300 group-hover:scale-[1.04]"
-              style={{ background: "none", width: "110px", height: "110px" }}
+              className="max-h-[145px] max-w-[92%] object-contain p-2 transition-transform duration-500 group-hover:scale-[1.1]"
+              style={{ background: "none", width: "145px", height: "145px" }}
             />
           ) : (
             <div className="flex h-full w-full items-center justify-center">
@@ -83,7 +83,7 @@ export default function ProductCard({ product }: Props) {
           {alertPrice !== null && (
             <div className="mt-1 text-xs font-medium text-slate-700">
               {isTargetMet ? (
-                <span className="text-green-700">Checkout now, price drop!</span>
+                <span className="text-green-700">Target reached. Great time to buy.</span>
               ) : (
                 <span>Alert set at {formatPrice(alertPrice, product.currency)}</span>
               )}

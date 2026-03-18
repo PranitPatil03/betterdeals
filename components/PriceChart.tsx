@@ -109,14 +109,14 @@ export default function PriceChart({
 
   if (data.length === 0) {
     return (
-      <div className="text-center py-8 text-gray-500 w-full rounded-xl border border-gray-200 bg-gray-50/70">
+      <div className="text-center py-8 text-gray-500 w-full rounded-xl bg-white/90">
         No price history yet. Check back after the first daily update!
       </div>
     );
   }
 
   return (
-    <div className="w-full rounded-2xl border border-gray-200 bg-gray-50/60 p-4">
+    <div className="w-full rounded-2xl bg-white/90 p-5">
       <div className="mb-3 flex items-center justify-between gap-3">
         <h4 className="text-sm font-semibold text-gray-800">Price history</h4>
 
@@ -137,7 +137,7 @@ export default function PriceChart({
         </div>
       </div>
 
-      <div className="mb-3 flex items-center justify-between rounded-xl border border-gray-200 bg-white px-3 py-2">
+      <div className="mb-3 flex items-center justify-between rounded-xl bg-slate-50 px-3 py-2">
         <div className="flex items-center gap-2 text-sm text-gray-600">
           {deltaVsAverage >= 0 ? (
             <ArrowDownRight className="size-4 text-green-600" />
@@ -151,7 +151,7 @@ export default function PriceChart({
         <span className="text-xs text-gray-400">Price intelligence</span>
       </div>
 
-      <div className="rounded-xl border border-gray-200 bg-white p-3">
+      <div className="rounded-xl bg-white p-3">
         <ResponsiveContainer width="100%" height={210}>
           <AreaChart data={filteredData}>
             <defs>
@@ -190,25 +190,25 @@ export default function PriceChart({
       </div>
 
       <div className="mt-4 grid grid-cols-2 gap-2">
-        <div className="rounded-xl border border-gray-200 bg-white p-3">
+        <div className="rounded-xl bg-slate-50 p-3">
           <p className="text-[11px] text-gray-400">Highest price</p>
           <p className="mt-1 text-lg font-semibold text-gray-900">{formatPrice(highest, currency)}</p>
         </div>
-        <div className="rounded-xl border border-gray-200 bg-white p-3">
+        <div className="rounded-xl bg-slate-50 p-3">
           <p className="text-[11px] text-gray-400">Average price</p>
           <p className="mt-1 text-lg font-semibold text-gray-900">{formatPrice(average, currency)}</p>
         </div>
-        <div className="rounded-xl border border-gray-200 bg-white p-3">
+        <div className="rounded-xl bg-slate-50 p-3">
           <p className="text-[11px] text-gray-400">Lowest price</p>
           <p className="mt-1 text-lg font-semibold text-gray-900">{formatPrice(lowest, currency)}</p>
         </div>
-        <div className="rounded-xl border border-blue-200 bg-blue-50/50 p-3">
+        <div className="rounded-xl bg-blue-50/70 p-3">
           <p className="text-[11px] text-blue-600">Current price</p>
           <p className="mt-1 text-lg font-semibold text-gray-900">{formatPrice(latest, currency)}</p>
         </div>
       </div>
 
-      <div className="mt-4 rounded-xl border border-gray-200 bg-white p-3">
+      <div className="mt-4 rounded-xl bg-slate-50 p-3">
         <div className="flex items-center gap-2 text-sm text-gray-500">
           <Clock3 className="size-4" />
           Should you buy now?

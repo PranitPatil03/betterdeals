@@ -2,7 +2,7 @@
 
 import { signOut } from "@/app/actions";
 import { Button } from "@/components/ui/button";
-import { Loader2, LogOut } from "lucide-react";
+import { CreditCard, Loader2, LogOut } from "lucide-react";
 import { toast } from "sonner";
 import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
@@ -16,6 +16,7 @@ interface Props {
 
 export default function DashboardHeader({ user, tier }: Props) {
   const [upgrading, setUpgrading] = useState(false);
+  const [openingBilling, setOpeningBilling] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -30,21 +31,37 @@ export default function DashboardHeader({ user, tier }: Props) {
     return () => document.removeEventListener("mousedown", handle);
   }, []);
 
-  const handlePlanAction = async () => {
+  const handleUpgrade = async () => {
     setUpgrading(true);
-    const endpoint = tier === "pro" ? "/api/stripe/portal" : "/api/stripe/checkout";
     try {
-      const res = await fetch(endpoint, { method: "POST" });
+      const res = await fetch("/api/stripe/checkout", { method: "POST" });
       const json = (await res.json()) as { url?: string; error?: string };
       if (json.url) {
         window.location.href = json.url;
       } else {
-        toast.error(json.error ?? "Unable to open billing");
+        toast.error(json.error ?? "Unable to open checkout");
         setUpgrading(false);
       }
     } catch {
       toast.error("Request failed");
       setUpgrading(false);
+    }
+  };
+
+  const handleOpenBilling = async () => {
+    setOpeningBilling(true);
+    try {
+      const res = await fetch("/api/stripe/portal", { method: "POST" });
+      const json = (await res.json()) as { url?: string; error?: string };
+      if (json.url) {
+        window.location.href = json.url;
+      } else {
+        toast.error(json.error ?? "Unable to open billing");
+        setOpeningBilling(false);
+      }
+    } catch {
+      toast.error("Request failed");
+      setOpeningBilling(false);
     }
   };
 
@@ -70,28 +87,24 @@ export default function DashboardHeader({ user, tier }: Props) {
         </div>
 
         <div className="flex items-center gap-3">
-          <Button
-            variant={tier === "pro" ? "outline" : "default"}
-            size="sm"
-            className={
-              tier === "pro"
-                ? "h-9 border-gray-300 bg-white text-gray-800 shadow-sm hover:bg-gray-50"
-                : "h-9 bg-linear-to-b from-sky-300 to-blue-500 text-white shadow-[0_4px_14px_rgba(56,189,248,0.40)] transition-all hover:scale-[1.01] hover:shadow-[0_6px_20px_rgba(56,189,248,0.55)]"
-            }
-            onClick={handlePlanAction}
-            disabled={upgrading}
-          >
-            {upgrading ? (
-              <>
-                <Loader2 className="size-3.5 animate-spin" />
-                Redirecting…
-              </>
-            ) : tier === "pro" ? (
-              "Billing"
-            ) : (
-              "Upgrade to Pro"
-            )}
-          </Button>
+          {tier !== "pro" && (
+            <Button
+              variant="default"
+              size="sm"
+              className="h-9 bg-linear-to-b from-sky-300 to-blue-500 text-white shadow-[0_4px_14px_rgba(56,189,248,0.40)] transition-all hover:scale-[1.01] hover:shadow-[0_6px_20px_rgba(56,189,248,0.55)]"
+              onClick={handleUpgrade}
+              disabled={upgrading}
+            >
+              {upgrading ? (
+                <>
+                  <Loader2 className="size-3.5 animate-spin" />
+                  Redirecting…
+                </>
+              ) : (
+                "Upgrade to Pro"
+              )}
+            </Button>
+          )}
 
           {/* Profile button + dropdown */}
           <div className="relative" ref={menuRef}>
@@ -114,6 +127,22 @@ export default function DashboardHeader({ user, tier }: Props) {
                   <p className="truncate text-sm font-semibold text-gray-900">{displayName}</p>
                   <p className="truncate text-xs text-gray-500">{user.email}</p>
                 </div>
+
+                {tier === "pro" && (
+                  <button
+                    type="button"
+                    onClick={handleOpenBilling}
+                    disabled={openingBilling}
+                    className="flex w-full items-center gap-2 px-4 py-2 text-sm text-gray-700 transition-colors hover:bg-gray-50 disabled:opacity-60"
+                  >
+                    {openingBilling ? (
+                      <Loader2 className="size-3.5 animate-spin" />
+                    ) : (
+                      <CreditCard className="size-3.5" />
+                    )}
+                    {openingBilling ? "Opening Billing..." : "Billing"}
+                  </button>
+                )}
 
                 {/* Sign out */}
                 <form action={signOut}>
