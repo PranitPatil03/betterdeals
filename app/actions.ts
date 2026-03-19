@@ -25,6 +25,16 @@ export async function addProduct(formData: FormData): Promise<AddProductResult> 
     return { error: "URL is required" };
   }
 
+  // Validate URL format
+  try {
+    const parsed = new URL(url);
+    if (!parsed.protocol.startsWith("http")) {
+      return { error: "Only HTTP/HTTPS URLs are supported" };
+    }
+  } catch {
+    return { error: "Please enter a valid URL" };
+  }
+
   try {
     const supabase = await createClient();
     const {
@@ -72,7 +82,6 @@ export async function addProduct(formData: FormData): Promise<AddProductResult> 
     const productData = await scrapeProduct(url);
 
     if (!productData.productName || !productData.currentPrice) {
-      console.log(productData, "productData");
       return { error: "Could not extract product information from this URL" };
     }
 
@@ -136,10 +145,17 @@ export async function addProduct(formData: FormData): Promise<AddProductResult> 
 export async function deleteProduct(productId: string) {
   try {
     const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) return { error: "Not authenticated" };
+
     const { error } = await supabase
       .from("products")
       .delete()
-      .eq("id", productId);
+      .eq("id", productId)
+      .eq("user_id", user.id);
 
     if (error) throw error;
 
@@ -154,9 +170,16 @@ export async function deleteProduct(productId: string) {
 export async function getProducts(): Promise<ProductRecord[]> {
   try {
     const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) return [];
+
     const { data, error } = await supabase
       .from("products")
       .select("*")
+      .eq("user_id", user.id)
       .order("created_at", { ascending: false })
       .returns<ProductRecord[]>();
 
@@ -173,6 +196,22 @@ export async function getPriceHistory(
 ): Promise<PriceHistoryRecord[]> {
   try {
     const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) return [];
+
+    // Verify the product belongs to the user before fetching history
+    const { data: product } = await supabase
+      .from("products")
+      .select("id")
+      .eq("id", productId)
+      .eq("user_id", user.id)
+      .maybeSingle<{ id: string }>();
+
+    if (!product) return [];
+
     const { data, error } = await supabase
       .from("price_history")
       .select("*")

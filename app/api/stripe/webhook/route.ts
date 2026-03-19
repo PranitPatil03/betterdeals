@@ -3,9 +3,14 @@ import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 import { getStripeClient } from "@/lib/stripe";
 import { getSupabaseAdmin } from "@/lib/supabase-admin";
+import { sendUpgradeConfirmation } from "@/lib/email";
 import type { SubscriptionRecord, SubscriptionStatus } from "@/lib/types";
 
 export const runtime = "nodejs";
+
+// Track processed event IDs to prevent duplicate processing on webhook retries
+const processedEvents = new Set<string>();
+const MAX_PROCESSED_EVENTS = 1000;
 
 function toIsoDate(unixTimestamp: number | null | undefined): string | null {
   if (!unixTimestamp) {
@@ -125,6 +130,19 @@ export async function POST(request: Request) {
   }
 
   try {
+    // Idempotency: skip already-processed events (Stripe retries on failure)
+    if (processedEvents.has(event.id)) {
+      return NextResponse.json({ received: true, skipped: true });
+    }
+    processedEvents.add(event.id);
+    // Prevent memory leak: cap set size
+    if (processedEvents.size > MAX_PROCESSED_EVENTS) {
+      const first = processedEvents.values().next().value;
+      if (first) processedEvents.delete(first);
+    }
+
+    console.log("[stripe-webhook] Processing event:", event.type, event.id);
+
     if (event.type === "checkout.session.completed") {
       const session = event.data.object as Stripe.Checkout.Session;
       const subscriptionId =
@@ -136,6 +154,8 @@ export async function POST(request: Request) {
           ? session.customer
           : session.customer?.id ?? null;
 
+      console.log("[stripe-webhook] checkout.session.completed");
+
       if (subscriptionId) {
         const subscription = await stripe.subscriptions.retrieve(subscriptionId);
         const userId =
@@ -144,8 +164,23 @@ export async function POST(request: Request) {
           subscription.metadata?.user_id ||
           (await resolveUserIdByStripeIds(subscription.id, customerId));
 
+        console.log("[stripe-webhook] Resolved userId:", userId);
+
         if (userId) {
           await upsertSubscriptionFromStripe(userId, subscription);
+
+          // Send upgrade confirmation email
+          const supabaseAdmin = getSupabaseAdmin();
+          if (supabaseAdmin) {
+            const { data: userData } = await supabaseAdmin.auth.admin.getUserById(userId);
+            const email = userData?.user?.email;
+            if (email) {
+              const emailResult = await sendUpgradeConfirmation(email, { planName: "Pro" });
+              if (emailResult.error) {
+                console.error("[stripe-webhook] Upgrade email failed:", emailResult.error);
+              }
+            }
+          }
         }
       }
     }
@@ -166,7 +201,30 @@ export async function POST(request: Request) {
         (await resolveUserIdByStripeIds(subscription.id, customerId));
 
       if (userId) {
-        await upsertSubscriptionFromStripe(userId, subscription);
+        // For deleted subscriptions, explicitly mark as canceled
+        if (event.type === "customer.subscription.deleted") {
+          const supabaseAdmin = getSupabaseAdmin();
+          if (supabaseAdmin) {
+            await supabaseAdmin.from("subscriptions").update({
+              status: "canceled" as SubscriptionStatus,
+              updated_at: new Date().toISOString(),
+            }).eq("user_id", userId);
+          }
+        } else {
+          await upsertSubscriptionFromStripe(userId, subscription);
+        }
+
+        // Send upgrade email on new active subscription
+        if (event.type === "customer.subscription.created" && subscription.status === "active") {
+          const supabaseAdmin = getSupabaseAdmin();
+          if (supabaseAdmin) {
+            const { data: userData } = await supabaseAdmin.auth.admin.getUserById(userId);
+            const email = userData?.user?.email;
+            if (email) {
+              await sendUpgradeConfirmation(email, { planName: "Pro" });
+            }
+          }
+        }
       }
     }
 

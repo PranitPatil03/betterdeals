@@ -15,7 +15,7 @@ const extractionSchema = z.object({
 
 export interface ScrapedProductData {
   productName: string;
-  currentPrice: number | string;
+  currentPrice: number;
   currencyCode?: string;
   productImageUrl?: string;
 }

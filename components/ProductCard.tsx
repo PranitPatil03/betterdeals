@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Bell, BellOff, TrendingDown } from "lucide-react";
+import { TrendingDown } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import ProductModal from "./ProductModal";
@@ -28,18 +28,16 @@ export default function ProductCard({ product }: Props) {
   const source = getSourceBadge(hostname);
   const currentPrice = Number(product.current_price);
   const alertPrice = product.alert_price ? Number(product.alert_price) : null;
-  // Alert is only valid when alert_price < current_price
-  const alertIsValid = alertPrice !== null && alertPrice < currentPrice;
-  const diff = alertPrice !== null ? currentPrice - alertPrice : null;
-  const isTargetMet = alertPrice !== null && currentPrice <= alertPrice && alertIsValid;
 
   return (
     <>
-      {/* Card — fixed square, click opens modal */}
-      <button
-        type="button"
+      {/* Card — fixed height, click opens modal */}
+      <div
+        role="button"
+        tabIndex={0}
         onClick={() => setOpen(true)}
-        className="group text-left w-full h-[290px] overflow-hidden rounded-2xl bg-white shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 flex flex-col"
+        onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setOpen(true); } }}
+        className="group text-left w-full h-[290px] overflow-hidden rounded-2xl bg-white shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 flex flex-col cursor-pointer"
       >
         {/* Product image — top half */}
         <div className="relative h-[160px] flex items-center justify-center">
@@ -64,13 +62,13 @@ export default function ProductCard({ product }: Props) {
         </div>
 
         {/* Card info — bottom half */}
-        <div className="flex flex-col justify-between px-4 py-3 gap-2 flex-1">
-          {/* Product name — single line, truncated */}
-          <p className="truncate text-sm font-semibold text-slate-900">
+        <div className="flex flex-col justify-between px-4 py-3 flex-1">
+          {/* Product name — two lines max, then truncate */}
+          <p className="line-clamp-2 text-sm font-semibold text-slate-900 leading-snug">
             {product.name}
           </p>
 
-          <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center justify-between gap-2 mt-auto pt-2">
             <span className="text-lg font-bold tracking-tight text-slate-900">
               {formatPrice(currentPrice, product.currency)}
             </span>
@@ -81,7 +79,7 @@ export default function ProductCard({ product }: Props) {
             </div>
           </div>
         </div>
-      </button>
+      </div>
 
       {/* Detail modal */}
       {open && (
