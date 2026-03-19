@@ -34,12 +34,8 @@ function CardsSkeleton() {
   );
 }
 
-async function ProductsSection({ userId }: { userId: string }) {
-  const [products, billing] = await Promise.all([
-    getProducts(),
-    getBillingSnapshotForUser(userId),
-  ]);
-
+async function ProductsSection() {
+  const products = await getProducts();
   return <DashboardView products={products} />;
 }
 
@@ -83,7 +79,7 @@ export default async function DashboardPage() {
 
         {/* Products — skeleton while loading, then real cards */}
         <Suspense fallback={<CardsSkeleton />}>
-          <ProductsSection userId={user.id} />
+          <ProductsSection />
         </Suspense>
       </div>
     </main>

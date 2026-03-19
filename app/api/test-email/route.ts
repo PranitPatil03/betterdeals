@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/utils/supabase/server";
-import { sendPriceDropAlert } from "@/lib/email";
+import { sendPriceDropAlert, sendUpgradeConfirmation } from "@/lib/email";
 import type { ProductRecord } from "@/lib/types";
 
 /**
@@ -29,7 +29,18 @@ export async function GET(request: Request) {
   if (!user?.email) {
     return NextResponse.json({ error: "Not logged in — sign in first" }, { status: 401 });
   }
-
+  // Test upgrade email: /api/test-email?type=upgrade
+  const type = searchParams.get("type");
+  if (type === "upgrade") {
+    const result = await sendUpgradeConfirmation(user.email, { planName: "Pro" });
+    if (result.error) {
+      return NextResponse.json({ error: result.error }, { status: 500 });
+    }
+    return NextResponse.json({
+      success: true,
+      message: `Upgrade confirmation email sent to ${user.email}`,
+    });
+  }
   // Get first product
   const { data: products } = await supabase
     .from("products")

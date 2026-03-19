@@ -88,7 +88,7 @@ export async function POST() {
       {
         user_id: user.id,
         stripe_customer_id: customerId,
-        status: subscription?.status ?? "incomplete",
+        status: subscription?.status ?? null,
         updated_at: new Date().toISOString(),
       },
       {

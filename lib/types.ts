@@ -33,10 +33,10 @@ export interface ProductRecord {
   user_id: string;
   url: string;
   name: string;
-  current_price: number | string;
+  current_price: number;
   currency: string;
   image_url: string | null;
-  alert_price: number | string | null;
+  alert_price: number | null;
   created_at?: string;
   updated_at?: string;
 }
@@ -44,7 +44,7 @@ export interface ProductRecord {
 export interface PriceHistoryRecord {
   id: string;
   product_id: string;
-  price: number | string;
+  price: number;
   currency: string;
   checked_at: string;
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Bell, BellOff, TrendingDown } from "lucide-react";
+import { TrendingDown } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import ProductModal from "./ProductModal";
@@ -28,10 +28,6 @@ export default function ProductCard({ product }: Props) {
   const source = getSourceBadge(hostname);
   const currentPrice = Number(product.current_price);
   const alertPrice = product.alert_price ? Number(product.alert_price) : null;
-  // Alert is only valid when alert_price < current_price
-  const alertIsValid = alertPrice !== null && alertPrice < currentPrice;
-  const diff = alertPrice !== null ? currentPrice - alertPrice : null;
-  const isTargetMet = alertPrice !== null && currentPrice <= alertPrice && alertIsValid;
 
   return (
     <>
