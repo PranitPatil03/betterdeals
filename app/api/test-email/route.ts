@@ -54,14 +54,54 @@ export async function GET(request: Request) {
 
   const product = products[0];
   const currentPrice = Number(product.current_price);
-  const fakeOldPrice = Math.round(currentPrice * 1.15 * 100) / 100; // 15% higher
+
+  // Look up the real previous price from price_history
+  const { data: history } = await supabase
+    .from("price_history")
+    .select("price")
+    .eq("product_id", product.id)
+    .order("checked_at", { ascending: false })
+    .limit(2)
+    .returns<{ price: number }[]>();
+
+  // Use the second-most-recent price as the old price, or fall back to current
+  const oldPrice =
+    history && history.length >= 2
+      ? Number(history[1].price)
+      : currentPrice;
+
+  if (oldPrice <= currentPrice) {
+    return NextResponse.json({
+      success: false,
+      message:
+        "No real price drop to report — current price is not lower than the previous price. This test only sends emails when there is a genuine recorded drop.",
+      product: product.name,
+      currentPrice,
+      oldPrice,
+    });
+  }
+
   const alertPrice = product.alert_price ? Number(product.alert_price) : null;
+
+  // Match cron logic: if alert_price is set, only send when price is at or below it
+  if (alertPrice !== null && currentPrice > alertPrice) {
+    return NextResponse.json({
+      success: false,
+      message:
+        "Price dropped but has not reached your alert price yet. Email will only be sent when the price drops to or below your target.",
+      product: product.name,
+      currentPrice,
+      oldPrice,
+      alertPrice,
+    });
+  }
+
   const isTargetHit = alertPrice !== null && currentPrice <= alertPrice;
 
   const result = await sendPriceDropAlert(
     user.email,
     product,
-    fakeOldPrice,
+    oldPrice,
     currentPrice,
     {
       isTargetHit,
@@ -75,9 +115,9 @@ export async function GET(request: Request) {
 
   return NextResponse.json({
     success: true,
-    message: `Test email sent to ${user.email}`,
+    message: `Test email sent to ${user.email} with real price data`,
     product: product.name,
-    fakeOldPrice,
+    oldPrice,
     currentPrice,
     isTargetHit,
   });

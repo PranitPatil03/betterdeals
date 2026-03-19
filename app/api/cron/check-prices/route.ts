@@ -127,7 +127,14 @@ export async function POST(request: Request) {
             results.targetHits++;
           }
 
-          if (newPrice < oldPrice) {
+          // Only send email when:
+          // - alert_price is set → price must drop to or below the alert price
+          // - alert_price is NOT set → any price drop triggers an email
+          const shouldEmail =
+            newPrice < oldPrice &&
+            (alertPrice === null || newPrice <= alertPrice);
+
+          if (shouldEmail) {
             const {
               data: { user },
             } = await supabase.auth.admin.getUserById(product.user_id);
